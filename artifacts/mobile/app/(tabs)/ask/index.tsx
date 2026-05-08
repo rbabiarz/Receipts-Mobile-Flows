@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { PillButton } from "@/components/PillButton";
 import { SuggestItem } from "@/components/SuggestItem";
 import { useApp } from "@/context/AppContext";
 
@@ -43,6 +42,7 @@ const SAFETY_PATTERNS = [
 export default function AskHome() {
   const insets = useSafeAreaInsets();
   const { savedAnswers, user } = useApp();
+
   const [query, setQuery] = useState("");
   const inputRef = useRef<TextInput>(null);
 
@@ -167,16 +167,6 @@ export default function AskHome() {
           ))}
         </View>
 
-        {!user.isPremium && (
-          <Pressable
-            onPress={() => router.push("/premium")}
-            style={styles.premiumBanner}
-          >
-            <Text style={styles.premiumBannerText}>
-              Unlock premium — unlimited Verify, Voice, Weekly digest →
-            </Text>
-          </Pressable>
-        )}
       </ScrollView>
     </View>
   );

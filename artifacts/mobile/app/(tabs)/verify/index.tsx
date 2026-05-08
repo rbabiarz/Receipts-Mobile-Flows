@@ -31,19 +31,11 @@ const VERDICT_LABELS: Record<VerdictType, string> = {
 
 export default function VerifyHome() {
   const insets = useSafeAreaInsets();
-  const { verifyHistory, verifyUsedToday, user } = useApp();
+  const { verifyHistory } = useApp();
   const [claim, setClaim] = useState("");
-
-  const freeLimit = 5;
-  const remaining = Math.max(0, freeLimit - verifyUsedToday);
-  const isAtLimit = !user.isPremium && remaining === 0;
 
   function handleVerify() {
     if (!claim.trim()) return;
-    if (isAtLimit) {
-      router.push("/premium");
-      return;
-    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push({
       pathname: "/(tabs)/verify/checking",
@@ -56,21 +48,10 @@ export default function VerifyHome() {
       <View
         style={[
           styles.topBar,
-          {
-            paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0),
-          },
+          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
         ]}
       >
         <Text style={styles.title}>Verify</Text>
-        {!user.isPremium && (
-          <Pressable onPress={() => router.push("/premium")}>
-            <View style={styles.limitChip}>
-              <Text style={styles.limitText}>
-                {remaining}/{freeLimit} left
-              </Text>
-            </View>
-          </Pressable>
-        )}
       </View>
 
       <ScrollView
@@ -111,26 +92,11 @@ export default function VerifyHome() {
           </View>
         </View>
 
-        {isAtLimit && (
-          <Pressable
-            style={styles.limitBanner}
-            onPress={() => router.push("/premium")}
-          >
-            <Text style={styles.limitBannerTitle}>
-              5 free Verifies used today
-            </Text>
-            <Text style={styles.limitBannerBody}>
-              Upgrade to premium for unlimited. $60/yr — no tiers, no add-ons.
-            </Text>
-            <Text style={styles.limitBannerCta}>Upgrade →</Text>
-          </Pressable>
-        )}
-
         <View style={styles.actions}>
           <PillButton
-            label={isAtLimit ? "Upgrade to Verify" : "Verify this claim →"}
+            label="Verify this claim →"
             onPress={handleVerify}
-            disabled={!claim.trim() && !isAtLimit}
+            disabled={!claim.trim()}
             flex
           />
         </View>
@@ -189,19 +155,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: -0.1,
   },
-  limitChip: {
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: "#e6e6e6",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  limitText: {
-    fontFamily: "Inter_500Medium",
-    fontSize: 10,
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
-  },
   scroll: { flex: 1 },
   explainer: {
     paddingHorizontal: 18,
@@ -255,29 +208,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontSize: 12,
     color: "#000000",
-  },
-  limitBanner: {
-    margin: 18,
-    borderRadius: 10,
-    backgroundColor: "#f4ecd6",
-    padding: 14,
-    gap: 4,
-  },
-  limitBannerTitle: {
-    fontFamily: "Inter_600SemiBold",
-    fontSize: 14,
-    color: "#000000",
-  },
-  limitBannerBody: {
-    fontFamily: "Inter_400Regular",
-    fontSize: 12,
-    lineHeight: 18,
-    opacity: 0.85,
-  },
-  limitBannerCta: {
-    fontFamily: "Inter_500Medium",
-    fontSize: 12,
-    marginTop: 4,
   },
   actions: {
     paddingHorizontal: 18,

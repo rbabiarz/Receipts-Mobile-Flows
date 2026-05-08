@@ -138,7 +138,6 @@ export interface PublishedStack {
 export interface UserProfile {
   email: string;
   initials: string;
-  isPremium: boolean;
   detailLevel: DetailLevel;
   tone: ToneType;
   evidenceFloor: EvidenceFloor;

@@ -31,10 +31,6 @@ function RootLayoutNav() {
         options={{ headerShown: false, presentation: "fullScreenModal" }}
       />
       <Stack.Screen
-        name="premium"
-        options={{ headerShown: false, presentation: "modal" }}
-      />
-      <Stack.Screen
         name="voice"
         options={{ headerShown: false, presentation: "modal" }}
       />

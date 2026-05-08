@@ -498,7 +498,6 @@ interface AppState {
   topics: Topic[];
   creators: Creator[];
   publishedStacks: PublishedStack[];
-  verifyUsedToday: number;
   setHasOnboarded: (v: boolean) => Promise<void>;
   setUser: (u: Partial<UserProfile>) => Promise<void>;
   addProtocol: (p: Protocol) => Promise<void>;
@@ -507,7 +506,6 @@ interface AppState {
   addAnswer: (a: Answer) => Promise<void>;
   addVerify: (v: VerifyResult) => Promise<void>;
   toggleFollowTopic: (id: string) => Promise<void>;
-  upgradeToPremium: () => Promise<void>;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -515,7 +513,6 @@ const AppContext = createContext<AppState | null>(null);
 const DEFAULT_USER: UserProfile = {
   email: "marcus@example.com",
   initials: "MR",
-  isPremium: false,
   detailLevel: "full",
   tone: "direct",
   evidenceFloor: "a_to_c",
@@ -534,7 +531,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     "rapamycin",
     "creatine",
   ]);
-  const [verifyUsedToday, setVerifyUsedToday] = useState(3);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -623,7 +619,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       AsyncStorage.setItem("verifyHistory", JSON.stringify(next));
       return next;
     });
-    setVerifyUsedToday((prev) => prev + 1);
   }, []);
 
   const toggleFollowTopic = useCallback(async (id: string) => {
@@ -635,10 +630,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
   }, []);
-
-  const upgradeToPremium = useCallback(async () => {
-    await setUser({ isPremium: true });
-  }, [setUser]);
 
   if (!loaded) return null;
 
@@ -654,7 +645,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         topics: MOCK_TOPICS,
         creators: MOCK_CREATORS,
         publishedStacks: MOCK_PUBLISHED_STACKS,
-        verifyUsedToday,
         setHasOnboarded,
         setUser,
         addProtocol,
@@ -663,7 +653,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addAnswer,
         addVerify,
         toggleFollowTopic,
-        upgradeToPremium,
       }}
     >
       {children}

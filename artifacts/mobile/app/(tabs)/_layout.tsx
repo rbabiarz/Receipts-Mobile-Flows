@@ -5,7 +5,7 @@ import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { Platform, StyleSheet, View, useColorScheme } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 function NativeTabLayout() {
   return (
@@ -35,28 +35,25 @@ function NativeTabLayout() {
 }
 
 function ClassicTabLayout() {
-  const colorScheme = useColorScheme();
   const isIOS = Platform.OS === "ios";
-  const isWeb = Platform.OS === "web";
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: "#ffffff",
-        tabBarInactiveTintColor: "rgba(255,255,255,0.45)",
+        tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
         tabBarStyle: {
           backgroundColor: isIOS ? "transparent" : "#000000",
           borderTopWidth: 0,
           elevation: 0,
-          height: isWeb ? 84 : 64,
-          paddingBottom: isWeb ? 34 : 8,
+          height: 72,
+          paddingBottom: 12,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontFamily: "Inter_500Medium",
-          fontSize: 9,
-          letterSpacing: 0.3,
+          fontSize: 10,
+          letterSpacing: 0.2,
         },
         tabBarBackground: () =>
           isIOS ? (
@@ -68,6 +65,10 @@ function ClassicTabLayout() {
           ) : null,
       }}
     >
+      <Tabs.Screen
+        name="index"
+        options={{ href: null }}
+      />
       <Tabs.Screen
         name="ask"
         options={{

@@ -218,11 +218,6 @@ export default function YouScreen() {
         ]}
       >
         <Text style={styles.title}>You</Text>
-        {user.isPremium && (
-          <View style={styles.premiumBadge}>
-            <Text style={styles.premiumText}>Premium</Text>
-          </View>
-        )}
       </View>
 
       <ScrollView
@@ -237,13 +232,6 @@ export default function YouScreen() {
           <Text style={[styles.joinDate, { color: "#ffffff", opacity: 0.55 }]}>
             Member since {user.joinedAt.split("-")[0]}
           </Text>
-          {!user.isPremium && (
-            <Pressable onPress={() => router.push("/premium")} style={styles.upgradeInline}>
-              <Text style={styles.upgradeInlineText}>
-                Upgrade to Premium · $60/yr →
-              </Text>
-            </Pressable>
-          )}
         </HeroBlock>
 
         <View style={styles.statsRow}>
