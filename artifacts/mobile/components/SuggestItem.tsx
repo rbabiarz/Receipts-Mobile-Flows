@@ -19,7 +19,7 @@ export function SuggestItem({ label, onPress, small = false }: Props) {
       <Text
         style={[
           styles.label,
-          { fontSize: small ? 12 : 13 },
+          { fontSize: small ? 14 : 15 },
         ]}
         numberOfLines={1}
       >
@@ -34,9 +34,9 @@ const styles = StyleSheet.create({
   row: {
     borderWidth: 1,
     borderColor: "#e6e6e6",
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 15,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   },
   arrow: {
     opacity: 0.4,
-    fontSize: 13,
+    fontSize: 15,
     marginLeft: 8,
   },
 });

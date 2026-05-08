@@ -62,8 +62,8 @@ export function PillButton({
           borderColor,
           opacity: pressed || disabled ? 0.65 : 1,
           flex: flex ? 1 : undefined,
-          paddingHorizontal: isSmall ? 10 : 14,
-          paddingVertical: isSmall ? 7 : 10,
+          paddingHorizontal: isSmall ? 14 : 20,
+          paddingVertical: isSmall ? 10 : 16,
         },
         style,
       ]}
@@ -74,7 +74,7 @@ export function PillButton({
         <Text
           style={[
             styles.label,
-            { color: textColor, fontSize: isSmall ? 11 : 13 },
+            { color: textColor, fontSize: isSmall ? 13 : 16 },
           ]}
         >
           {label}
