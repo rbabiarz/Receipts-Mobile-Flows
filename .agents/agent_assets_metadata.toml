@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "bXihSBnwIv0r913yXu-6r"
+uri = "file://artifacts/mobile/assets/images/icon.png"
+type = "image"
+title = "receipts app icon"

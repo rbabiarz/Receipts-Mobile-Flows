@@ -1,0 +1,2737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Receipts — Mobile flows (mock)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@320;330;340;400;480;540;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  /* =========================================================
+     Tokens — bloodwork DESIGN.md
+     ========================================================= */
+  :root {
+    --ink: #000000;
+    --canvas: #ffffff;
+    --hairline: #e6e6e6;
+    --hairline-soft: #f1f1f1;
+    --surface-soft: #f7f7f5;
+    --board: #efefea;
+
+    --block-lime:  #dceeb1;
+    --block-lilac: #c5b0f4;
+    --block-cream: #f4ecd6;
+    --block-mint:  #c8e6cd;
+    --block-coral: #f3c9b6;
+    --block-pink:  #efd4d4;
+    --block-navy:  #1f1d3d;
+
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 22px;
+    --r-pill: 50px;
+    --r-full: 9999px;
+    --r-phone: 38px;
+
+    --t-display: -0.96px;
+    --t-headline: -0.26px;
+    --t-body: -0.14px;
+    --t-link: -0.10px;
+    --t-mono: 0.54px;
+    --t-mono-tight: 0.60px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--board);
+    color: var(--ink);
+    font-family: "Inter", "SF Pro Display", system-ui, sans-serif;
+    font-feature-settings: "kern" 1;
+    font-weight: 320;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  ul, ol { margin: 0; padding: 0; list-style: none; }
+
+  .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: var(--t-mono); }
+
+  /* =========================================================
+     PAGE FRAME
+     ========================================================= */
+  .page {
+    max-width: 1680px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+  .page-head { margin-bottom: 56px; }
+  .page-head .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 13px; letter-spacing: var(--t-mono); text-transform: uppercase;
+    opacity: 0.62;
+  }
+  .page-head h1 {
+    font-size: clamp(34px, 4vw, 56px);
+    font-weight: 540; letter-spacing: var(--t-display);
+    line-height: 1.10;
+    margin: 12px 0 16px;
+    max-width: 22ch;
+  }
+  .page-head p {
+    font-size: 18px; font-weight: 330; letter-spacing: var(--t-body);
+    line-height: 1.50;
+    max-width: 64ch; margin: 0;
+    opacity: 0.78;
+  }
+
+  /* =========================================================
+     FLOW ROWS
+     ========================================================= */
+  .flow {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(0,0,0,0.10);
+  }
+  .flow-head { margin-bottom: 32px; max-width: 64ch; }
+  .flow-head .label {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 12px; letter-spacing: var(--t-mono); text-transform: uppercase;
+    opacity: 0.62;
+  }
+  .flow-head h2 {
+    font-size: 28px; font-weight: 540; letter-spacing: var(--t-headline);
+    line-height: 1.15;
+    margin: 8px 0 8px;
+  }
+  .flow-head p {
+    font-size: 16px; font-weight: 330; letter-spacing: var(--t-body);
+    line-height: 1.50;
+    margin: 0; opacity: 0.78;
+  }
+
+  .frames {
+    display: flex; gap: 32px;
+    overflow-x: auto;
+    padding: 16px 4px 32px;
+    scroll-snap-type: x mandatory;
+  }
+  .frames::-webkit-scrollbar { height: 8px; }
+  .frames::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.16); border-radius: 4px; }
+
+  /* =========================================================
+     PHONE FRAME
+     ========================================================= */
+  .step { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; flex: 0 0 auto; scroll-snap-align: start; }
+  .step .num {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.62;
+  }
+  .step .cap {
+    font-size: 13px; font-weight: 480; letter-spacing: var(--t-body);
+    line-height: 1.40;
+    width: 320px;
+  }
+  .step .cap em {
+    font-style: normal; font-weight: 330; opacity: 0.65;
+    display: block; margin-top: 2px;
+  }
+
+  .phone {
+    width: 320px; height: 640px;
+    background: var(--canvas);
+    border-radius: var(--r-phone);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .phone .status {
+    height: 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 22px 0;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: var(--t-mono-tight);
+  }
+  .phone .status .dots {
+    display: inline-flex; gap: 3px;
+  }
+  .phone .status .dots span {
+    width: 4px; height: 4px; border-radius: var(--r-full); background: var(--ink); opacity: 0.6;
+  }
+  .phone .nav-top {
+    padding: 8px 18px 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 0.5px solid var(--hairline);
+  }
+  .phone .nav-top .word { font-weight: 540; font-size: 16px; letter-spacing: -0.3px; }
+  .phone .nav-top .right { display: flex; align-items: center; gap: 8px; }
+  .phone .nav-top .premium {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 9px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    border: 1px solid var(--hairline); padding: 3px 7px; border-radius: var(--r-pill);
+  }
+  .phone .nav-top .av {
+    width: 26px; height: 26px; border-radius: var(--r-full);
+    background: var(--surface-soft); font-weight: 540; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .phone .body {
+    flex: 1; overflow: hidden;
+    padding: 16px 18px 12px;
+  }
+  .phone .tabbar {
+    border-top: 0.5px solid var(--hairline);
+    height: 52px;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    background: var(--canvas);
+  }
+  .tabbar .tab {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    font-size: 10px; font-weight: 480; letter-spacing: var(--t-body);
+    opacity: 0.6;
+  }
+  .tabbar .tab.active { opacity: 1; }
+  .tabbar .tab .ic {
+    width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 540;
+  }
+
+  /* =========================================================
+     SHARED — small UI atoms inside the phone
+     ========================================================= */
+  .eyebrow-mono {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.62;
+  }
+  .h-display {
+    font-size: 22px; font-weight: 540; letter-spacing: var(--t-headline);
+    line-height: 1.18; margin: 6px 0 10px;
+  }
+  .h-section {
+    font-size: 16px; font-weight: 540; letter-spacing: var(--t-body);
+    margin: 0 0 8px;
+  }
+  .copy-sm {
+    font-size: 13px; font-weight: 330; letter-spacing: var(--t-body);
+    line-height: 1.50;
+  }
+  .copy-md {
+    font-size: 14px; font-weight: 330; letter-spacing: var(--t-body);
+    line-height: 1.50;
+  }
+  .pill-dark {
+    background: var(--ink); color: var(--canvas);
+    border-radius: var(--r-pill);
+    padding: 9px 14px;
+    font-size: 13px; font-weight: 480; letter-spacing: var(--t-link);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .pill-light {
+    background: var(--canvas); color: var(--ink);
+    border-radius: var(--r-pill);
+    padding: 9px 14px;
+    font-size: 13px; font-weight: 480; letter-spacing: var(--t-link);
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--hairline);
+  }
+  .pill-ghost {
+    background: rgba(0,0,0,0.04); color: var(--ink);
+    border-radius: var(--r-pill); padding: 6px 10px;
+    font-size: 11px; font-weight: 480; letter-spacing: var(--t-body);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .input-bar {
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-pill);
+    padding: 10px 14px;
+    font-size: 13px; font-weight: 330; letter-spacing: var(--t-body);
+    display: flex; align-items: center; gap: 8px;
+    background: var(--canvas);
+  }
+  .input-bar .lab {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.55;
+  }
+  .input-bar .text { flex: 1; }
+  .grade-letter {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    background: var(--canvas); color: var(--ink);
+    width: 18px; height: 18px; border-radius: var(--r-full);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500;
+  }
+  .meta-line {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.62;
+  }
+
+  /* =========================================================
+     SCREEN-SPECIFIC blocks (per flow)
+     ========================================================= */
+
+  /* lilac hero (compressed for mobile) */
+  .lilac-hero {
+    background: var(--block-lilac);
+    border-radius: var(--r-md);
+    padding: 14px;
+    margin: 0 -18px 12px;
+    border-radius: 0;
+  }
+  .lilac-hero .grade-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .lilac-hero .grade-pill {
+    background: var(--ink); color: var(--canvas);
+    border-radius: var(--r-pill);
+    padding: 4px 9px;
+    font-size: 11px; font-weight: 540;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .lilac-hero .meta-pill {
+    background: var(--canvas);
+    border-radius: var(--r-pill);
+    padding: 4px 9px;
+    font-size: 11px; font-weight: 480;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .lilac-hero h2 {
+    font-size: 18px; font-weight: 540; letter-spacing: var(--t-headline);
+    line-height: 1.20;
+    margin: 0 0 8px;
+  }
+  .lilac-hero p {
+    font-size: 13px; font-weight: 330; letter-spacing: var(--t-body);
+    line-height: 1.50;
+    margin: 0;
+  }
+  .lilac-hero p strong { font-weight: 540; }
+
+  /* takeaways */
+  .takeaways {
+    background: var(--canvas);
+    border-radius: var(--r-md);
+    padding: 12px;
+    margin: 0 0 12px;
+    border: 1px solid var(--hairline);
+  }
+  .takeaways .label {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 9px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.62;
+    margin-bottom: 8px;
+  }
+  .takeaways li {
+    display: flex; gap: 6px;
+    font-size: 12px; font-weight: 330; line-height: 1.45;
+    padding: 4px 0;
+  }
+  .takeaways li .b { flex: 0 0 8px; opacity: 0.55; }
+
+  /* receipt rows */
+  .r-row {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 6px;
+  }
+  .r-row:last-child { border-bottom: 0; }
+  .r-row .ord {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.55;
+    padding-top: 1px;
+  }
+  .r-row .ttl {
+    font-size: 13px; font-weight: 540; letter-spacing: var(--t-body);
+    line-height: 1.30;
+  }
+  .r-row .cite {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 9px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.62;
+    margin-top: 3px;
+  }
+  .r-row .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .chip-sm {
+    border-radius: var(--r-pill);
+    padding: 2px 7px;
+    font-size: 10px; font-weight: 540; letter-spacing: var(--t-body);
+    background: var(--canvas);
+    border: 1px solid var(--hairline);
+  }
+  .chip-sm.a { background: var(--block-mint); border-color: transparent; }
+  .chip-sm.b { background: var(--block-lime); border-color: transparent; }
+  .chip-sm.c { background: var(--block-cream); border-color: transparent; }
+  .chip-sm.d { background: var(--block-coral); border-color: transparent; }
+
+  /* contradictions block */
+  .contra {
+    background: var(--block-coral);
+    border-radius: var(--r-md);
+    padding: 12px;
+    margin: 0 -18px;
+  }
+  .contra h3 {
+    font-size: 14px; font-weight: 540; letter-spacing: var(--t-headline);
+    margin: 4px 0 4px;
+  }
+  .contra p {
+    font-size: 12px; font-weight: 330; line-height: 1.45;
+    margin: 0 0 8px;
+  }
+
+  /* search suggestions */
+  .suggest-list { display: flex; flex-direction: column; gap: 6px; }
+  .suggest {
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    padding: 10px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; font-weight: 330; letter-spacing: var(--t-body);
+  }
+  .suggest .arrow { opacity: 0.4; }
+
+  /* loader */
+  .loader-stage {
+    border-bottom: 1px dashed rgba(0,0,0,0.18);
+    padding: 10px 0;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .loader-stage:last-of-type { border-bottom: 0; }
+  .loader-stage .ic {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px;
+    width: 22px; height: 22px; border-radius: var(--r-full);
+    background: var(--surface-soft);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .loader-stage.done .ic { background: var(--block-mint); }
+  .loader-stage.active .ic { background: var(--block-lilac); }
+  .loader-stage .lab { font-size: 13px; font-weight: 480; }
+  .loader-stage .meta { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: var(--t-mono-tight); text-transform: uppercase; opacity: 0.6; margin-left: auto; }
+
+  /* verdict (Verify flow) */
+  .verdict-block {
+    border-radius: var(--r-md);
+    padding: 14px;
+    margin: 0 -18px 12px;
+  }
+  .verdict-block.mixed { background: var(--block-cream); }
+  .verdict-block.supported { background: var(--block-mint); }
+  .verdict-block.contradicted { background: var(--block-coral); }
+  .verdict-block .ver {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: var(--t-mono); text-transform: uppercase;
+    opacity: 0.72;
+  }
+  .verdict-block h2 {
+    font-size: 22px; font-weight: 540; letter-spacing: var(--t-headline);
+    line-height: 1.15;
+    margin: 6px 0 8px;
+  }
+  .verdict-block p {
+    font-size: 12px; font-weight: 330; letter-spacing: var(--t-body);
+    line-height: 1.50;
+    margin: 0;
+  }
+
+  .quoted {
+    border-left: 2px solid var(--ink);
+    padding: 6px 10px;
+    margin: 8px 0 12px;
+    font-size: 12px; font-weight: 330; line-height: 1.40;
+    background: var(--surface-soft);
+  }
+  .quoted .src {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 9px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.62;
+    display: block; margin-top: 4px;
+  }
+
+  /* Stack list */
+  .stack-row {
+    padding: 11px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .stack-row:last-child { border-bottom: 0; }
+  .stack-row .row1 { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .stack-row .nm { font-size: 14px; font-weight: 480; letter-spacing: var(--t-body); }
+  .stack-row .stt {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 9px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    padding: 2px 7px; border-radius: var(--r-pill);
+    background: var(--surface-soft);
+  }
+  .stack-row .stt.run { background: var(--block-mint); }
+  .stack-row .stt.tri { background: var(--block-cream); }
+  .stack-row .stt.psd { background: var(--surface-soft); }
+  .stack-row .meta { font-size: 11px; opacity: 0.65; margin-top: 2px; }
+
+  /* protocol detail header (lime) */
+  .proto-hero {
+    background: var(--block-lime);
+    border-radius: 0;
+    padding: 14px 18px 16px;
+    margin: 0 -18px 12px;
+  }
+  .proto-hero .stt {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: var(--t-mono); text-transform: uppercase;
+    opacity: 0.72;
+  }
+  .proto-hero h2 {
+    font-size: 22px; font-weight: 540; letter-spacing: var(--t-headline);
+    line-height: 1.15;
+    margin: 6px 0 6px;
+  }
+  .proto-hero .sub { font-size: 13px; font-weight: 330; letter-spacing: var(--t-body); line-height: 1.45; }
+
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; margin: 12px 0; }
+  .field { border-bottom: 1px solid var(--hairline); padding-bottom: 8px; }
+  .field .lab {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 9px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.62;
+    display: block;
+  }
+  .field .val { font-size: 13px; font-weight: 480; margin-top: 3px; }
+
+  /* timeline (n=1) */
+  .timeline { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+  .tl-item {
+    display: grid; grid-template-columns: 16px 1fr auto; gap: 8px;
+    font-size: 12px; line-height: 1.40;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+  .tl-item:last-child { border-bottom: 0; }
+  .tl-item .dot { font-size: 10px; opacity: 0.55; padding-top: 2px; }
+  .tl-item .ttl { font-weight: 480; }
+  .tl-item .meta { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: var(--t-mono-tight); text-transform: uppercase; opacity: 0.6; }
+
+  /* readout (mint) */
+  .readout {
+    background: var(--block-mint);
+    border-radius: 0;
+    padding: 14px 18px 16px;
+    margin: 0 -18px 12px;
+  }
+  .readout .delta-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 6px; }
+  .readout .delta {
+    font-size: 28px; font-weight: 540; letter-spacing: var(--t-display);
+    font-variant-numeric: tabular-nums;
+  }
+  .readout .delta .units { font-size: 12px; font-weight: 330; opacity: 0.65; margin-left: 4px; }
+  .readout .delta-label {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: var(--t-mono); text-transform: uppercase;
+    opacity: 0.72;
+  }
+  .readout p {
+    font-size: 12px; font-weight: 330; letter-spacing: var(--t-body);
+    line-height: 1.50;
+    margin: 8px 0 0;
+  }
+
+  /* sticky bottom CTA inside phone */
+  .phone-bottom-cta {
+    position: absolute;
+    left: 14px; right: 14px;
+    bottom: 64px;
+    display: flex; gap: 8px;
+  }
+  .phone-bottom-cta .pill-dark, .phone-bottom-cta .pill-light { flex: 1; justify-content: center; }
+
+  /* arrow between phones */
+  .arrow {
+    align-self: center;
+    width: 32px; height: 1px;
+    background: rgba(0,0,0,0.30);
+    position: relative;
+    margin: 0 -8px;
+    flex: 0 0 32px;
+  }
+  .arrow::after {
+    content: ""; position: absolute; right: -1px; top: -4px;
+    width: 0; height: 0;
+    border-left: 7px solid rgba(0,0,0,0.30);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+  }
+
+  /* small disclosure under phone body */
+  .disc {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 8px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.55;
+    line-height: 1.50;
+    margin-top: 8px;
+  }
+
+  /* keyboard mock */
+  .kb {
+    background: var(--surface-soft);
+    border-top: 0.5px solid var(--hairline);
+    padding: 8px 6px 10px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .kb .row { display: flex; gap: 4px; justify-content: center; }
+  .kb .key {
+    flex: 1;
+    height: 28px;
+    background: var(--canvas);
+    border-radius: 6px;
+    font-size: 12px; font-weight: 480;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kb .key.wide { flex: 1.6; background: rgba(0,0,0,0.08); font-size: 10px; }
+
+  /* footer */
+  footer.global {
+    margin-top: 64px;
+    border-top: 1px solid rgba(0,0,0,0.10);
+    padding: 24px 0 0;
+    text-align: center;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px; letter-spacing: var(--t-mono-tight); text-transform: uppercase;
+    opacity: 0.55;
+  }
+
+  @media (max-width: 700px) {
+    .page { padding: 32px 16px 64px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="page">
+
+  <header class="page-head">
+    <div class="eyebrow">Receipts · iOS / Android · Mobile flows v0.2</div>
+    <h1>Eleven mobile flows for the member app.</h1>
+    <p>Each row is one user journey, left to right. Three core loops (Ask, Verify, Stack), three v1 supporting flows (Onboarding, Topics, Account), three HW-tier flows (Influencer Map, Published Stacks, Voice), and two safety/commercial flows (Acute-concern triage, Premium upgrade). Phone frames are 320 × 640 at 1× density. Design system shared with InsightBlood (DESIGN.md).</p>
+  </header>
+
+  <!-- =====================================================
+       FLOW A — ASK THE RESEARCH AGENT
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow A · The core loop</div>
+      <h2>Ask the Research Agent.</h2>
+      <p>Marcus opens the app on a Saturday morning, asks a longevity question, gets a graded answer with receipts, and adds the protocol to his Stack as a 12-week trial.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- A1: Home / Ask -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top">
+            <span class="word">Receipts</span>
+            <span class="right"><span class="premium">Premium</span><span class="av">MR</span></span>
+          </div>
+          <div class="body">
+            <div class="eyebrow-mono">Saturday · 9:41 AM</div>
+            <h2 class="h-display">What do you want receipts on?</h2>
+            <div class="input-bar" style="margin-bottom: 14px;">
+              <span class="lab">Ask</span>
+              <span class="text" style="opacity:0.45;">Type a question…</span>
+            </div>
+            <div class="eyebrow-mono" style="margin-bottom:8px;">Trending in your topics</div>
+            <div class="suggest-list">
+              <div class="suggest">Taurine on healthspan in humans <span class="arrow">→</span></div>
+              <div class="suggest">Creatine + cognitive performance <span class="arrow">→</span></div>
+              <div class="suggest">Rapamycin healthspan trials <span class="arrow">→</span></div>
+              <div class="suggest">Zone 2 vs HIIT for VO₂max <span class="arrow">→</span></div>
+            </div>
+            <div class="disc">Educational tool, not medical advice. Source allowlist visible in Settings.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab active"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">A1</div>
+        <div class="cap">Home tab — Ask. <em>Trending suggestions are personalized off the user's followed topics. Premium tag visible; no upgrade nag.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- A2: Composing the question -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top">
+            <span class="word" style="font-size:14px;opacity:0.6;">← Back</span>
+            <span class="right"><span class="premium">Premium</span></span>
+          </div>
+          <div class="body" style="padding-bottom: 0;">
+            <div class="eyebrow-mono" style="margin-bottom:6px;">New question</div>
+            <div class="input-bar" style="margin-bottom: 10px;">
+              <span class="lab">Ask</span>
+              <span class="text">What's the evidence for taurine on heal|</span>
+            </div>
+            <div class="eyebrow-mono" style="margin-bottom:6px;">Receipts will check</div>
+            <div class="suggest-list" style="gap:4px;">
+              <div class="suggest" style="padding:8px 12px; font-size:12px;">PubMed · 38M abstracts</div>
+              <div class="suggest" style="padding:8px 12px; font-size:12px;">Cochrane systematic reviews</div>
+              <div class="suggest" style="padding:8px 12px; font-size:12px;">USPSTF / AHA / Endocrine Society</div>
+              <div class="suggest" style="padding:8px 12px; font-size:12px;">bioRxiv / medRxiv (labeled)</div>
+            </div>
+          </div>
+          <div class="kb">
+            <div class="row"><div class="key">q</div><div class="key">w</div><div class="key">e</div><div class="key">r</div><div class="key">t</div><div class="key">y</div><div class="key">u</div><div class="key">i</div><div class="key">o</div><div class="key">p</div></div>
+            <div class="row"><div class="key">a</div><div class="key">s</div><div class="key">d</div><div class="key">f</div><div class="key">g</div><div class="key">h</div><div class="key">j</div><div class="key">k</div><div class="key">l</div></div>
+            <div class="row"><div class="key wide">⇧</div><div class="key">z</div><div class="key">x</div><div class="key">c</div><div class="key">v</div><div class="key">b</div><div class="key">n</div><div class="key">m</div><div class="key wide">⌫</div></div>
+            <div class="row"><div class="key wide">123</div><div class="key" style="flex:5;">space</div><div class="key wide" style="background:var(--ink);color:var(--canvas);">go</div></div>
+          </div>
+        </div>
+        <div class="num">A2</div>
+        <div class="cap">Composing. <em>The "Receipts will check" preview shows the user the source allowlist before they submit — sets the trust frame.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- A3: Agent reasoning loop -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Researching…</span><span class="right"><span class="premium">14s</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono" style="margin-bottom:8px;">Atlas-pattern reasoning loop</div>
+            <h2 class="h-section" style="font-size:14px;line-height:1.35;">"What's the evidence for taurine on healthspan in humans?"</h2>
+            <div style="margin-top:8px;">
+              <div class="loader-stage done"><div class="ic">✓</div><div class="lab">Decompose</div><div class="meta">6 sub-q</div></div>
+              <div class="loader-stage done"><div class="ic">✓</div><div class="lab">Retrieve</div><div class="meta">38 papers</div></div>
+              <div class="loader-stage done"><div class="ic">✓</div><div class="lab">Evaluate quality</div><div class="meta">6 kept</div></div>
+              <div class="loader-stage active"><div class="ic">●</div><div class="lab">Refine — check contradictions</div><div class="meta">2 found</div></div>
+              <div class="loader-stage"><div class="ic">○</div><div class="lab">Synthesize plain-English</div><div class="meta">FK ≤ 9</div></div>
+              <div class="loader-stage"><div class="ic">○</div><div class="lab">Safety post-filter</div><div class="meta">v1.4</div></div>
+            </div>
+            <div class="disc">No parametric guesses. Answer grounded in retrieved sources only.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab active"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">A3</div>
+        <div class="cap">Reasoning loop, transparent. <em>Retrieve → evaluate → refine → synthesize. Showing the work is part of the trust contract.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- A4: Graded answer -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Answer</span><span class="right"><span class="pill-ghost">Save</span></span></div>
+          <div class="body" style="padding: 0 0 12px; overflow-y: auto;">
+            <div class="lilac-hero" style="margin: 0; border-radius: 0;">
+              <div class="meta-line" style="opacity:0.72;">14s · 6 sources · last reviewed 2026-04-18</div>
+              <h2>Taurine for healthspan in humans</h2>
+              <div class="grade-row">
+                <span class="grade-pill"><span class="grade-letter">C</span>Suggestive</span>
+                <span class="meta-pill">2 contradictions</span>
+              </div>
+              <p><strong>Mouse data is real, human data is thin.</strong> A 2023 mouse study made headlines. Two small RCTs in adults show modest blood-pressure and lipid effects at 1.5–6 g/day. <strong>No human longevity trial exists.</strong></p>
+            </div>
+            <div style="padding: 12px 18px 0;">
+              <div class="takeaways">
+                <div class="label">Plain-English takeaways</div>
+                <ul>
+                  <li><span class="b">—</span><span>Mouse lifespan often doesn't translate to humans.</span></li>
+                  <li><span class="b">—</span><span>Modest BP + triglyceride drops at 1–3 g/day.</span></li>
+                  <li><span class="b">—</span><span>Generally well-tolerated in healthy adults.</span></li>
+                  <li><span class="b">—</span><span><strong>Open:</strong> dose-response above 3 g, long-term safety.</span></li>
+                </ul>
+              </div>
+              <div class="eyebrow-mono" style="margin-bottom:6px;">Receipts · 6 sources</div>
+              <div class="r-row">
+                <div class="ord">01</div>
+                <div>
+                  <div class="ttl">Taurine deficiency drives aging</div>
+                  <div class="cite">Singh · Science · 2023 · Mouse · n=250</div>
+                  <div class="chips"><span class="chip-sm d">D · Animal</span><span class="chip-sm">Replicated</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">02</div>
+                <div>
+                  <div class="ttl">Taurine + cardiometabolic risk</div>
+                  <div class="cite">Guan · Adv Nutr · 2024 · Meta · 12 RCTs</div>
+                  <div class="chips"><span class="chip-sm b">B · Meta</span><span class="chip-sm">Heterogeneity</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">03</div>
+                <div>
+                  <div class="ttl">Endothelial function in prehypertensives</div>
+                  <div class="cite">Sun · Hypertens Res · 2016 · RCT · n=120</div>
+                  <div class="chips"><span class="chip-sm b">B · RCT</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Receipts</a>
+            <a class="pill-dark">+ Add to Stack</a>
+          </div>
+          <div class="tabbar">
+            <div class="tab active"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">A4</div>
+        <div class="cap">The graded answer. <em>Lilac hero · grade chip · plain-English takeaways · scrollable receipts list. Sticky CTA on the bottom: drill into Receipts or add to Stack.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- A5: Add-to-Stack confirmation -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:42</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Add to Stack</span><span class="right"><span class="pill-ghost">Cancel</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">New protocol</div>
+            <h2 class="h-display">Taurine — 12-week trial</h2>
+            <p class="copy-sm" style="margin: 0 0 12px;">We pre-filled this from the literature. Tweak anything before you commit.</p>
+
+            <div class="field-grid">
+              <div class="field"><span class="lab">Dose</span><span class="val">2 g/day</span></div>
+              <div class="field"><span class="lab">Timing</span><span class="val">AM, w/ food</span></div>
+              <div class="field"><span class="lab">Duration</span><span class="val">12 weeks</span></div>
+              <div class="field"><span class="lab">Washout</span><span class="val">4 weeks</span></div>
+              <div class="field"><span class="lab">Outcome marker</span><span class="val">SBP + ApoB</span></div>
+              <div class="field"><span class="lab">Source</span><span class="val">InsightBlood</span></div>
+            </div>
+
+            <div class="eyebrow-mono">Reminders</div>
+            <div class="suggest-list" style="margin-bottom:12px;">
+              <div class="suggest" style="padding:8px 12px;font-size:12px;">Daily adherence ping at 8:00 AM <span class="arrow">●</span></div>
+              <div class="suggest" style="padding:8px 12px;font-size:12px;">Re-test in 12 weeks: 2026-07-30 <span class="arrow">●</span></div>
+            </div>
+
+            <div class="disc">Honest about evidence: this is a Grade C protocol. We will surface contradictions when new evidence lands.</div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Save draft</a>
+            <a class="pill-dark">Start trial</a>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab active"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">A5</div>
+        <div class="cap">Add to Stack. <em>Pre-filled n=1 scaffolding from the literature. User can edit anything. Outcome marker links to InsightBlood when authorized.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW B — VERIFY A CLAIM
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow B · The acquisition wedge</div>
+      <h2>Verify an influencer's claim.</h2>
+      <p>Priya sees an Instagram post that bothers her. She opens Receipts, pastes the claim, and gets a verdict in under 20 seconds. The fastest path from "I'm skeptical" to "I have receipts."</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- B1: Verify entry -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:14</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top">
+            <span class="word">Verify</span>
+            <span class="right"><span class="premium">5 left today</span></span>
+          </div>
+          <div class="body">
+            <div class="eyebrow-mono">Verify any claim</div>
+            <h2 class="h-display">Paste it. We'll check the literature.</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">Quote, screenshot, podcast clip, or a URL. We don't comment on the creator — we surface what the papers say.</p>
+
+            <div class="input-bar" style="align-items: flex-start; padding: 12px 14px; min-height: 90px;">
+              <span class="lab" style="margin-top:2px;">Claim</span>
+              <span class="text" style="opacity:0.45;">e.g. "AG1 boosts gut microbiome diversity"</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+              <span class="pill-ghost">Paste from clipboard</span>
+              <span class="pill-ghost">+ URL</span>
+              <span class="pill-ghost">+ Screenshot</span>
+            </div>
+
+            <div class="eyebrow-mono" style="margin-top:18px;">Recently verified</div>
+            <div class="r-row" style="border-top: 1px solid var(--hairline); padding-top:10px;">
+              <div class="ord" style="opacity:0.55;">●</div>
+              <div>
+                <div class="ttl" style="font-size:12px;">"Mouth-taping improves sleep quality"</div>
+                <div class="chips" style="margin-top:4px;"><span class="chip-sm c">Mixed</span><span class="chip-sm">2 days ago</span></div>
+              </div>
+            </div>
+            <div class="r-row">
+              <div class="ord" style="opacity:0.55;">●</div>
+              <div>
+                <div class="ttl" style="font-size:12px;">"Magnesium glycinate prevents migraine"</div>
+                <div class="chips" style="margin-top:4px;"><span class="chip-sm b">Supported</span><span class="chip-sm">5 days ago</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab active"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">B1</div>
+        <div class="cap">Verify entry. <em>Free tier shows daily limit (5 left today). Recent verifications give a sense of what good output looks like.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- B2: Parsing -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:14</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Parsing claim</span><span class="right"><span class="premium">8s</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">From: instagram.com/p/CzX… <span style="opacity:0.55;">(@drhealthcoach)</span></div>
+            <div class="quoted" style="margin-top:8px;">
+              "Drinking AG1 every morning will completely transform your gut microbiome diversity in 30 days. The science is clear."
+              <span class="src">Reel · 2026-05-04</span>
+            </div>
+
+            <div class="eyebrow-mono">We interpreted this as</div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-md);padding:12px;margin: 6px 0 14px;">
+              <p class="copy-sm" style="margin:0;"><strong>Daily AG1 supplementation</strong> increases <strong>gut microbiome alpha-diversity</strong> in healthy adults within <strong>30 days</strong>.</p>
+            </div>
+
+            <div style="margin-top: 8px;">
+              <div class="loader-stage done"><div class="ic">✓</div><div class="lab">Parse claim</div></div>
+              <div class="loader-stage done"><div class="ic">✓</div><div class="lab">Search PubMed + Cochrane</div></div>
+              <div class="loader-stage active"><div class="ic">●</div><div class="lab">Score quality + COI</div></div>
+              <div class="loader-stage"><div class="ic">○</div><div class="lab">Render verdict</div></div>
+            </div>
+
+            <div class="disc">If our interpretation is wrong, you can refine on the next screen.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab active"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">B2</div>
+        <div class="cap">Parsing the claim. <em>Receipts shows its interpretation in plain English. The user can refine if we got the framing wrong.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- B3: Verdict — Mixed -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:14</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Verdict</span><span class="right"><span class="pill-ghost">Save</span></span></div>
+          <div class="body" style="padding:0 0 12px;">
+            <div class="verdict-block mixed">
+              <div class="ver">Verdict</div>
+              <h2>Mixed evidence.</h2>
+              <p>One company-funded study supports the claim. No independent RCT replicates it. The mechanism is plausible but the causal demonstration is weak.</p>
+            </div>
+            <div style="padding:0 18px;">
+              <div class="quoted" style="margin: 0 0 12px;">
+                "Drinking AG1 every morning will completely transform your gut microbiome diversity in 30 days."
+                <span class="src">@drhealthcoach · IG · 2026-05-04</span>
+              </div>
+
+              <div class="eyebrow-mono">What the literature says</div>
+              <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+                <div class="ord">+</div>
+                <div>
+                  <div class="ttl">AG1 + microbiome diversity in adults</div>
+                  <div class="cite">Holscher · 2023 · Open-label · n=20 · Funded by AG1</div>
+                  <div class="chips"><span class="chip-sm c">C · Industry-funded</span><span class="chip-sm">No control</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">−</div>
+                <div>
+                  <div class="ttl">No effect of multi-ingredient greens powder on stool microbiome composition</div>
+                  <div class="cite">Patel · Gut Microbes · 2024 · RCT · n=72</div>
+                  <div class="chips"><span class="chip-sm b">B · RCT</span><span class="chip-sm">Independent</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">~</div>
+                <div>
+                  <div class="ttl">Greens powders and microbial diversity: a review</div>
+                  <div class="cite">Cochrane · 2024 · Heterogeneous</div>
+                  <div class="chips"><span class="chip-sm b">B · Review</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Refine claim</a>
+            <a class="pill-dark">Share receipts</a>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab active"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">B3</div>
+        <div class="cap">Verdict — Mixed. <em>Cream block (yellow) for Mixed; Mint for Supported; Coral for Contradicted. Both supporting AND contradicting receipts shown by default.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- B4: Receipt detail -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:15</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Receipt</span><span class="right"><span class="pill-ghost">Open ↗</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Receipt 02 of 03</div>
+            <h2 class="h-section" style="font-size:18px;line-height:1.25;">No effect of multi-ingredient greens powder on stool microbiome composition</h2>
+            <div class="meta-line" style="margin: 6px 0 12px;">Patel et al. · Gut Microbes · 2024</div>
+
+            <div class="field-grid">
+              <div class="field"><span class="lab">Study type</span><span class="val">RCT, double-blind</span></div>
+              <div class="field"><span class="lab">Sample</span><span class="val">n = 72 adults</span></div>
+              <div class="field"><span class="lab">Duration</span><span class="val">12 weeks</span></div>
+              <div class="field"><span class="lab">Funding</span><span class="val">NIH R01 · independent</span></div>
+            </div>
+
+            <div class="eyebrow-mono">In plain English</div>
+            <p class="copy-sm" style="margin: 6px 0 14px;">A team gave 72 healthy adults either a greens powder or a matched placebo for 12 weeks, and sequenced their stool at start and end. <strong>The two groups looked the same.</strong> No statistically significant change in alpha-diversity (a measure of how varied the gut bacteria are). Effect size near zero.</p>
+
+            <div class="eyebrow-mono">Quality flags</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin: 6px 0 14px;">
+              <span class="chip-sm b">B · RCT</span>
+              <span class="chip-sm">Preregistered</span>
+              <span class="chip-sm">No COI</span>
+              <span class="chip-sm">Adequately powered</span>
+            </div>
+
+            <div class="eyebrow-mono">Why this matters</div>
+            <p class="copy-sm" style="margin: 6px 0 0;">A well-run independent RCT showing no effect is stronger evidence than a small open-label study showing an effect. That's why the verdict is Mixed, not Supported.</p>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab active"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">B4</div>
+        <div class="cap">Drill into one receipt. <em>Plain-English study summary, quality flags exposed, "why this matters" reframes the verdict logic for a non-clinician.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW C — STACK & N=1 READOUT
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow C · The engagement loop</div>
+      <h2>Stack and the n=1 readout.</h2>
+      <p>Marcus's berberine 12-week trial just hit week 12. He gets a re-test reminder, ingests his fresh InsightBlood panel, and sees the before/after in plain English — without us claiming causation.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- C1: Stack list -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>10:08</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top">
+            <span class="word">My Stack</span>
+            <span class="right"><span class="pill-ghost">+ Add</span></span>
+          </div>
+          <div class="body">
+            <div class="eyebrow-mono" style="margin-bottom:6px;">3 active · 1 paused · 4 completed</div>
+            <div style="display:flex; gap:6px; margin-bottom:10px;">
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Active</span>
+              <span class="pill-ghost">Trial</span>
+              <span class="pill-ghost">Paused</span>
+              <span class="pill-ghost">Done</span>
+            </div>
+
+            <div class="stack-row">
+              <div class="row1"><span class="nm">Creatine 5 g/day</span><span class="stt run">Running</span></div>
+              <div class="meta">Started 2026-02-04 · Grade A · cognition + grip</div>
+            </div>
+            <div class="stack-row">
+              <div class="row1"><span class="nm">Zone 2, 180 min/wk</span><span class="stt run">Running</span></div>
+              <div class="meta">Started 2025-11-10 · Grade A · VO₂max + HbA1c</div>
+            </div>
+            <div class="stack-row" style="background:var(--block-cream); margin: 6px -18px; padding: 11px 18px;">
+              <div class="row1"><span class="nm">Berberine 500 mg ×3</span><span class="stt tri">Re-test due</span></div>
+              <div class="meta">Week 12 of 12 · fasting glucose · tap to read out</div>
+            </div>
+            <div class="stack-row">
+              <div class="row1"><span class="nm">Cold plunge 3 ×/wk</span><span class="stt psd">Paused</span></div>
+              <div class="meta">Paused 2026-04-22 · no clear effect</div>
+            </div>
+            <div class="stack-row">
+              <div class="row1"><span class="nm">Taurine 2 g/day</span><span class="stt tri">12-wk trial</span></div>
+              <div class="meta">Started today · re-test 2026-07-30</div>
+            </div>
+
+            <div class="disc">Stacks are private by default. Premium lets you publish a Stack to subscribers (HW-4).</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab active"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">C1</div>
+        <div class="cap">Stack home. <em>Cream-highlighted row signals the protocol with a re-test due — the natural entry point for the n=1 readout.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- C2: Protocol detail -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>10:08</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Protocol</span><span class="right"><span class="pill-ghost">Edit</span></span></div>
+          <div class="body" style="padding: 0 0 12px;">
+            <div class="proto-hero">
+              <div class="stt">Trial · week 12 of 12 · re-test due</div>
+              <h2>Berberine 500 mg ×3</h2>
+              <div class="sub">Started 2026-02-12 · 89% adherence · Grade C evidence</div>
+            </div>
+            <div style="padding: 0 18px;">
+              <div class="field-grid">
+                <div class="field"><span class="lab">Hypothesis</span><span class="val">Lower fasting glucose</span></div>
+                <div class="field"><span class="lab">Outcome</span><span class="val">Fasting glucose</span></div>
+                <div class="field"><span class="lab">Baseline</span><span class="val">98 mg/dL</span></div>
+                <div class="field"><span class="lab">Source</span><span class="val">InsightBlood</span></div>
+              </div>
+
+              <div class="eyebrow-mono">Timeline</div>
+              <div class="timeline">
+                <div class="tl-item"><span class="dot">●</span><div><div class="ttl">Started berberine</div><div>500 mg ×3, with meals</div></div><div class="meta">Feb 12</div></div>
+                <div class="tl-item"><span class="dot">●</span><div><div class="ttl">Adherence dip — travel</div><div>4 days missed</div></div><div class="meta">Mar 18</div></div>
+                <div class="tl-item"><span class="dot">●</span><div><div class="ttl">Mid-trial check-in</div><div>Subjective energy: same</div></div><div class="meta">Apr 04</div></div>
+                <div class="tl-item"><span class="dot">●</span><div><div class="ttl">Re-test prompt</div><div>Upload your week-12 panel</div></div><div class="meta">Today</div></div>
+              </div>
+
+              <div class="disc" style="margin-top:14px;">n=1 is a journaling framework with structure, not a clinical trial. We never claim causation.</div>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Pause</a>
+            <a class="pill-dark">Run readout</a>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab active"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">C2</div>
+        <div class="cap">Protocol detail. <em>Lime hero · adherence + timeline · field grid for n=1 structure. "Run readout" pulls the latest InsightBlood panel.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- C3: Readout -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>10:09</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Readout</span><span class="right"><span class="pill-ghost">Share</span></span></div>
+          <div class="body" style="padding: 0 0 12px;">
+            <div class="readout">
+              <div class="delta-label">Fasting glucose · 12 weeks</div>
+              <div class="delta-row">
+                <div><div class="meta-line" style="opacity:0.72;">Baseline</div><div class="delta" style="font-size:22px;">98<span class="units">mg/dL</span></div></div>
+                <div style="opacity:0.5;font-size:18px;">→</div>
+                <div><div class="meta-line" style="opacity:0.72;">Week 12</div><div class="delta" style="font-size:22px;">91<span class="units">mg/dL</span></div></div>
+                <div style="margin-left:auto;text-align:right;"><div class="meta-line" style="opacity:0.72;">Δ</div><div class="delta" style="font-size:22px;">−7<span class="units">mg/dL</span></div></div>
+              </div>
+              <p><strong>Your number went down.</strong> Whether the berberine caused it is a different question.</p>
+            </div>
+
+            <div style="padding: 0 18px;">
+              <div class="eyebrow-mono">What this does and doesn't tell you</div>
+              <div class="takeaways" style="margin-top:6px;">
+                <ul>
+                  <li><span class="b">+</span><span><strong>The change is real and measurable.</strong> 7 mg/dL drop, 89% adherence, no major confounders logged.</span></li>
+                  <li><span class="b">~</span><span><strong>It might not be the berberine.</strong> You also added 180 min/wk of zone 2 in week 4. Zone 2 alone has Grade A evidence for HbA1c.</span></li>
+                  <li><span class="b">~</span><span><strong>Single-marker, single-person, single-window.</strong> Don't extrapolate.</span></li>
+                  <li><span class="b">+</span><span><strong>What helps next:</strong> a 4-week washout would tell you more.</span></li>
+                </ul>
+              </div>
+
+              <div class="eyebrow-mono">Receipts on this protocol</div>
+              <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+                <div class="ord">01</div>
+                <div>
+                  <div class="ttl">Berberine + glycemic control: meta-analysis</div>
+                  <div class="cite">Lan · J Ethnopharmacol · 2015 · 27 trials</div>
+                  <div class="chips"><span class="chip-sm c">C · Heterogeneous</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Schedule washout</a>
+            <a class="pill-dark">Save readout</a>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab active"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">C3</div>
+        <div class="cap">n=1 readout. <em>Mint block · before/after deltas. Crucial copy: "Your number went down. Whether the berberine caused it is a different question." Confounders surfaced honestly.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- C4: Contradiction alert -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>10:11</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Notification</span></div>
+          <div class="body" style="padding: 0 0 12px;">
+            <div class="contra" style="margin: 0; border-radius: 0; padding: 16px 18px;">
+              <div class="meta-line" style="opacity:0.72;">Contradiction alert · taurine</div>
+              <h3 style="font-size:18px;">New evidence pushes back on a protocol you started today.</h3>
+              <p>A paper in <em>Aging Cell</em> reports no effect of 3 g/day taurine on biological-age clocks over 24 weeks. We surface this because we said we would.</p>
+            </div>
+            <div style="padding: 12px 18px 0;">
+              <div class="r-row" style="border-top: 0; padding-top: 0;">
+                <div class="ord">−</div>
+                <div>
+                  <div class="ttl">No effect of 3 g/day taurine on biological-age clocks over 24 weeks</div>
+                  <div class="cite">Patel · Aging Cell · 2025 · RCT · n=88</div>
+                  <div class="chips"><span class="chip-sm b">B · RCT</span><span class="chip-sm">Preregistered</span></div>
+                </div>
+              </div>
+
+              <div class="eyebrow-mono" style="margin-top:14px;">What this means for your trial</div>
+              <p class="copy-sm" style="margin:6px 0 12px;">It doesn't change your protocol mid-stream. But it lowers the prior. If your week-12 readout shows no movement, this is the most likely reason. We'll re-grade taurine across the library on the next quarterly review.</p>
+
+              <div class="eyebrow-mono">Want to do something?</div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="pill-ghost">Pause trial</span>
+                <span class="pill-ghost">Tighten outcome</span>
+                <span class="pill-ghost">Dismiss</span>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab active"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">C4</div>
+        <div class="cap">Contradiction alert (HW-10). <em>The product earns trust by surfacing dissent against your own protocols, not just the world's. Coral block, soft notification, never alarmist.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW D — ONBOARDING (first-run)
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow D · First run</div>
+      <h2>Onboarding.</h2>
+      <p>Five screens from app open to first answer. Sets the trust frame early — source allowlist, plain-language commitment, no-supplement-revenue disclosure — before asking for anything.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- D1: Splash -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:38</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="body" style="display:flex; flex-direction:column; justify-content:space-between; padding: 56px 24px 24px;">
+            <div>
+              <div class="eyebrow-mono">Receipts</div>
+              <h1 style="font-size:36px; font-weight:540; letter-spacing:var(--t-display); line-height:1.05; margin: 12px 0 16px;">Show me the receipts.</h1>
+              <p class="copy-md" style="opacity:0.78;">A research agent for longevity-curious adults. Ask any health question, get a graded answer, drill into the primary literature.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <a class="pill-dark" style="justify-content:center;">Create account</a>
+              <a class="pill-light" style="justify-content:center;">I already have one</a>
+              <p class="disc" style="text-align:center; margin-top:10px;">Educational tool · not medical advice · no supplement revenue ever</p>
+            </div>
+          </div>
+        </div>
+        <div class="num">D1</div>
+        <div class="cap">Splash. <em>Tagline up top, trust frame in the disclosure line. No imagery, no testimonials — the wordmark and promise carry it.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- D2: Sign up -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:38</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Sign up</span><span class="right"><span class="meta-line">1 / 4</span></span></div>
+          <div class="body">
+            <h2 class="h-display">What's your email?</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">We'll send you a sign-in code. Passkey on next step.</p>
+            <div class="input-bar" style="margin-bottom: 14px;">
+              <span class="lab">Email</span>
+              <span class="text">marcus@example.com|</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:18px;">
+              <span class="pill-ghost">Apple</span>
+              <span class="pill-ghost">Google</span>
+              <span class="pill-ghost">Passkey</span>
+            </div>
+
+            <div class="eyebrow-mono">What we'll do with this</div>
+            <div class="takeaways" style="margin-top:6px;">
+              <ul>
+                <li><span class="b">●</span><span>Sign you in. That's it.</span></li>
+                <li><span class="b">●</span><span>Never sold. Never shared. Never advertised against.</span></li>
+                <li><span class="b">●</span><span>One-tap export and one-tap deletion in Settings.</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-dark" style="flex:1;justify-content:center;">Send code</a>
+          </div>
+        </div>
+        <div class="num">D2</div>
+        <div class="cap">Email + passkey. <em>The "what we'll do with this" panel earns trust before the user types — privacy posture surfaced, not buried.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- D3: Topics -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:39</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Topics</span><span class="right"><span class="meta-line">2 / 4</span></span></div>
+          <div class="body">
+            <h2 class="h-display">What do you want receipts on?</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">Pick what's interesting. Personalizes your home suggestions and your weekly digest. You can change this any time.</p>
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Longevity ✓</span>
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Sleep ✓</span>
+              <span class="pill-ghost">Gut health</span>
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Cognition ✓</span>
+              <span class="pill-ghost">Hormones</span>
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Metabolic ✓</span>
+              <span class="pill-ghost">Cardio</span>
+              <span class="pill-ghost">Strength + recovery</span>
+              <span class="pill-ghost">Stress</span>
+              <span class="pill-ghost">Nutrition</span>
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Supplements ✓</span>
+              <span class="pill-ghost">Skin + hair</span>
+              <span class="pill-ghost">Fertility</span>
+              <span class="pill-ghost">Cold + heat</span>
+              <span class="pill-ghost">Fasting</span>
+            </div>
+
+            <div class="eyebrow-mono" style="margin-top:18px;">5 selected · suggested 4–8</div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Skip</a>
+            <a class="pill-dark">Continue</a>
+          </div>
+        </div>
+        <div class="num">D3</div>
+        <div class="cap">Topics. <em>Pill multi-select. Selected pills go ink/canvas-inverted. Personalizes Ask suggestions and the premium weekly digest.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- D4: Detail level -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:39</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Detail level</span><span class="right"><span class="meta-line">3 / 4</span></span></div>
+          <div class="body">
+            <h2 class="h-display">How deep do you want to go?</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">Three levels. Editable any time. Affects how much detail Receipts shows by default — never affects whether citations appear.</p>
+
+            <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:14px; margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;"><strong style="font-size:14px;">Gist</strong><span class="meta-line">~80 words</span></div>
+              <p class="copy-sm" style="margin:6px 0 0;opacity:0.78;">Verdict, key takeaways, top 2 receipts. Headlines without the math.</p>
+            </div>
+            <div style="border:2px solid var(--ink); border-radius:var(--r-md); padding:14px; margin-bottom:8px; background:var(--block-lilac);">
+              <div style="display:flex; justify-content:space-between; align-items:center;"><strong style="font-size:14px;">Full ✓</strong><span class="meta-line">~200 words</span></div>
+              <p class="copy-sm" style="margin:6px 0 0;">Verdict, takeaways, top 4–6 receipts, contradictions surfaced. <strong>Recommended.</strong></p>
+            </div>
+            <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;"><strong style="font-size:14px;">Max + always cite</strong><span class="meta-line">~400 words</span></div>
+              <p class="copy-sm" style="margin:6px 0 0;opacity:0.78;">Everything. Effect sizes, CIs, mechanism notes, every receipt inline. Sentence-level citations.</p>
+            </div>
+
+            <div class="disc" style="margin-top:12px;">FK readability ≤ 9 enforced at every level — we translate, we don't dumb down.</div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Back</a>
+            <a class="pill-dark">Continue</a>
+          </div>
+        </div>
+        <div class="num">D4</div>
+        <div class="cap">Detail level. <em>Per §13.2 personalization panel. Default selection is "Full" — chosen, with lilac block highlight. Citations never gated.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- D5: First question demo -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>9:40</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Try Receipts</span><span class="right"><span class="meta-line">4 / 4</span></span></div>
+          <div class="body">
+            <h2 class="h-display">Ask your first question.</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">Free tier covers unlimited search and 5 Verifies a day. Citations are never paywalled.</p>
+
+            <div class="eyebrow-mono">Try one of these</div>
+            <div class="suggest-list" style="margin: 6px 0 14px;">
+              <div class="suggest">Should I take creatine for cognition? <span class="arrow">→</span></div>
+              <div class="suggest">Is mouth-taping safe? <span class="arrow">→</span></div>
+              <div class="suggest">Magnesium glycinate vs threonate <span class="arrow">→</span></div>
+              <div class="suggest">Zone 2 vs HIIT for VO₂max <span class="arrow">→</span></div>
+            </div>
+
+            <div class="eyebrow-mono">Or ask anything</div>
+            <div class="input-bar" style="margin-top:6px;">
+              <span class="lab">Ask</span>
+              <span class="text" style="opacity:0.45;">Type a question…</span>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Skip — explore later</a>
+          </div>
+        </div>
+        <div class="num">D5</div>
+        <div class="cap">First question. <em>Drops the user into the core loop with low-friction starter prompts. Free-tier limits stated up front, no upsell.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW E — TOPICS
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow E · Browse</div>
+      <h2>Topic pages.</h2>
+      <p>Curated topic per stable URL (MH-6). State of evidence, key papers, contradiction map, open questions, last-reviewed date. The reading-mode surface — slower, deeper than Ask.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- E1: Topics index -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>14:22</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word">Topics</span><span class="right"><span class="pill-ghost">Search</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Curated · 200 topics live</div>
+            <div style="display:flex; gap:6px; margin: 8px 0 14px;">
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Following</span>
+              <span class="pill-ghost">Longevity</span>
+              <span class="pill-ghost">Sleep</span>
+              <span class="pill-ghost">Cognition</span>
+              <span class="pill-ghost">More</span>
+            </div>
+
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Rapamycin and healthspan</div>
+                <div class="cite">Updated 2026-04-22 · 24 papers</div>
+                <div class="chips" style="margin-top:6px;"><span class="chip-sm c">C — Suggestive</span><span class="chip-sm">3 contradictions</span></div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Creatine for cognitive performance</div>
+                <div class="cite">Updated 2026-03-30 · 18 papers</div>
+                <div class="chips" style="margin-top:6px;"><span class="chip-sm a">A — Strong</span></div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Continuous glucose monitoring in non-diabetics</div>
+                <div class="cite">Updated 2026-04-01 · 31 papers</div>
+                <div class="chips" style="margin-top:6px;"><span class="chip-sm c">C — Suggestive</span><span class="chip-sm">5 contradictions</span></div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">NMN and NAD+ precursors</div>
+                <div class="cite">Updated 2026-02-18 · 22 papers</div>
+                <div class="chips" style="margin-top:6px;"><span class="chip-sm d">D — Hype watch</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">E1</div>
+        <div class="cap">Topics index. <em>Each topic shows current grade and contradiction count up front. "Hype watch" is a deliberate D-grade label for buzzy claims with thin evidence.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- E2: Topic detail -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>14:22</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Topic</span><span class="right"><span class="pill-ghost">+ Follow</span></span></div>
+          <div class="body" style="padding:0 0 12px;">
+            <div class="lilac-hero" style="margin:0;">
+              <div class="meta-line" style="opacity:0.72;">Topic · last reviewed 2026-04-22</div>
+              <h2>Rapamycin and healthspan</h2>
+              <div class="grade-row">
+                <span class="grade-pill"><span class="grade-letter">C</span>Suggestive</span>
+                <span class="meta-pill">3 contradictions</span>
+                <span class="meta-pill">24 papers</span>
+              </div>
+              <p><strong>State of evidence:</strong> Strong mechanistic + animal data. Human safety data from transplant patients. <strong>Zero completed human longevity RCTs.</strong> Three are running (PEARL, RAP-ZONE, MILES).</p>
+            </div>
+            <div style="padding:0 18px;">
+              <div class="eyebrow-mono" style="margin: 12px 0 6px;">Open questions</div>
+              <div class="takeaways" style="margin-bottom:12px;">
+                <ul>
+                  <li><span class="b">?</span><span>Optimal intermittent dose schedule in healthy adults.</span></li>
+                  <li><span class="b">?</span><span>Long-term immune effects of weekly dosing.</span></li>
+                  <li><span class="b">?</span><span>Whether mouse lifespan effects scale to humans.</span></li>
+                </ul>
+              </div>
+
+              <div class="eyebrow-mono" style="margin-bottom:6px;">Key papers</div>
+              <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+                <div class="ord">01</div>
+                <div>
+                  <div class="ttl">Rapamycin extends lifespan in genetically heterogeneous mice</div>
+                  <div class="cite">Harrison · Nature · 2009 · ITP</div>
+                  <div class="chips"><span class="chip-sm d">D · Animal</span><span class="chip-sm">Replicated 4×</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">02</div>
+                <div>
+                  <div class="ttl">PEARL trial — interim safety in healthy older adults</div>
+                  <div class="cite">Mannick · Aging Cell · 2024 · RCT · n=120</div>
+                  <div class="chips"><span class="chip-sm b">B · RCT</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">E2</div>
+        <div class="cap">Topic detail. <em>Stable URL surface. Lilac hero · open questions panel · key papers list. The "state of evidence" line is the lede.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- E3: Contradiction map -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>14:23</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Contradictions</span></div>
+          <div class="body" style="padding:0 0 12px;">
+            <div class="contra" style="margin:0; border-radius:0; padding:14px 18px;">
+              <div class="meta-line" style="opacity:0.72;">Contradiction map · rapamycin</div>
+              <h3 style="font-size:18px;">Where the literature disagrees.</h3>
+              <p>Three live disagreements. We surface them so you don't have to find out from a comment thread.</p>
+            </div>
+            <div style="padding:14px 18px 0;">
+              <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px; margin-bottom:10px;">
+                <div class="eyebrow-mono">Disagreement 1 · Mouse-to-human translation</div>
+                <p class="copy-sm" style="margin:6px 0;">Austad &amp; Hoffman (2024) argue mouse lifespan effects rarely scale; Kaeberlein (2023) argues mTOR mechanism is conserved.</p>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;"><span class="chip-sm b">2 reviews</span><span class="chip-sm">Open question</span></div>
+              </div>
+              <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px; margin-bottom:10px;">
+                <div class="eyebrow-mono">Disagreement 2 · Optimal dosing</div>
+                <p class="copy-sm" style="margin:6px 0;">Weekly 5 mg (Mannick) vs daily low-dose (Blagosklonny). RCT data favors weekly; mechanistic argument favors daily.</p>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;"><span class="chip-sm c">Mixed</span><span class="chip-sm">RCT incoming</span></div>
+              </div>
+              <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px;">
+                <div class="eyebrow-mono">Disagreement 3 · Immune effects</div>
+                <p class="copy-sm" style="margin:6px 0;">Some studies show immune enhancement at low dose; others show suppression at standard transplant dose. Dose-dependent.</p>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;"><span class="chip-sm b">Resolved by dose</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">E3</div>
+        <div class="cap">Contradiction map. <em>The differentiator vs. cherry-picking influencers. Each disagreement is a structured object — what's contested, by whom, on what evidence.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- E4: Following confirmation / weekly digest preview -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>14:23</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Following</span><span class="right"><span class="meta-line">12 topics</span></span></div>
+          <div class="body">
+            <div style="background:var(--block-mint); border-radius:var(--r-md); padding:14px; margin: 0 -18px 14px;">
+              <div class="eyebrow-mono" style="opacity:0.72;">You're following</div>
+              <h2 class="h-display" style="margin:6px 0;">Rapamycin and healthspan</h2>
+              <p class="copy-sm" style="margin:0;">We'll surface new evidence in your weekly digest — and notify you immediately if anything contradicts a Stack protocol.</p>
+            </div>
+
+            <div class="eyebrow-mono">Preview — this Monday's digest</div>
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+              <div class="ord">+</div>
+              <div>
+                <div class="ttl">PEARL interim safety published</div>
+                <div class="cite">Mannick · Aging Cell · 2026-05-01</div>
+                <div class="chips"><span class="chip-sm b">B · RCT</span><span class="chip-sm">Followed topic</span></div>
+              </div>
+            </div>
+            <div class="r-row">
+              <div class="ord">~</div>
+              <div>
+                <div class="ttl">Creatine — meta-analysis update</div>
+                <div class="cite">Forbes · Nutrients · 2026-04-28</div>
+                <div class="chips"><span class="chip-sm a">A → A</span><span class="chip-sm">Followed topic</span></div>
+              </div>
+            </div>
+            <div class="r-row">
+              <div class="ord">−</div>
+              <div>
+                <div class="ttl">CGM in non-diabetics: no behavior change</div>
+                <div class="cite">Klemp · JAMA · 2026-04-30</div>
+                <div class="chips"><span class="chip-sm c">Mixed</span><span class="chip-sm">Followed topic</span></div>
+              </div>
+            </div>
+
+            <div class="disc">Digest is premium (HW-5). Free tier still gets contradiction alerts on your Stack.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">E4</div>
+        <div class="cap">Following + digest preview. <em>Mint affirmation block. Weekly digest preview shows what's coming — earns the premium upsell honestly.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW F — INFLUENCER-TO-EVIDENCE MAP (HW-3)
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow F · HW-3</div>
+      <h2>Influencer-to-evidence map.</h2>
+      <p>Index of public protocols from named creators with each claim linked to its evidence chain. <strong>No commentary on the creator</strong> — just receipts on individual claims. The acquisition wedge for Priya.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- F1: Creators index -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>20:11</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Creators</span><span class="right"><span class="pill-ghost">Search</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Public-claim index · 38 creators</div>
+            <p class="copy-sm" style="margin: 8px 0 14px;">We index creators' public protocols and grade each claim against the literature. We do not rate the creator. We rate the claim.</p>
+
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Peter Attia</div>
+                <div class="cite">42 indexed claims · 28 supported · 9 mixed · 5 unproven</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Andrew Huberman</div>
+                <div class="cite">94 indexed claims · 51 supported · 30 mixed · 13 unproven</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Bryan Johnson</div>
+                <div class="cite">63 indexed claims · 22 supported · 27 mixed · 14 unproven</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Rhonda Patrick</div>
+                <div class="cite">71 indexed claims · 49 supported · 18 mixed · 4 unproven</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Casey Means</div>
+                <div class="cite">38 indexed claims · 17 supported · 14 mixed · 7 unproven</div>
+              </div>
+            </div>
+
+            <div class="disc">We index public claims (podcasts, books, posts). We don't index private content. Claim corrections welcome.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">F1</div>
+        <div class="cap">Creators index. <em>Counts of supported / mixed / unproven claims per creator. The framing is "we rate claims, not creators" — written into the disclosure.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- F2: Creator profile -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>20:12</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Huberman</span><span class="right"><span class="pill-ghost">+ Follow</span></span></div>
+          <div class="body" style="padding:0 0 12px;">
+            <div style="background:var(--block-cream); padding:14px 18px 16px; margin:0 -18px 12px;">
+              <div class="eyebrow-mono" style="opacity:0.72;">Andrew Huberman</div>
+              <h2 style="font-size:22px;font-weight:540;letter-spacing:var(--t-headline);line-height:1.18;margin:6px 0 10px;">94 indexed claims, graded.</h2>
+              <div style="display:flex; gap:6px;">
+                <span class="chip-sm a" style="font-size:11px;">51 supported</span>
+                <span class="chip-sm c" style="font-size:11px;">30 mixed</span>
+                <span class="chip-sm d" style="font-size:11px;">13 unproven</span>
+              </div>
+            </div>
+            <div style="padding:0 18px;">
+              <div class="eyebrow-mono" style="margin-bottom:6px;">Recent claims</div>
+              <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+                <div class="ord">+</div>
+                <div>
+                  <div class="ttl">"Morning sunlight within 30 min of waking helps regulate cortisol."</div>
+                  <div class="cite">Lab #198 · 2026-03-12</div>
+                  <div class="chips"><span class="chip-sm a">Supported</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">~</div>
+                <div>
+                  <div class="ttl">"Taurine is one of the most underrated longevity tools."</div>
+                  <div class="cite">Lab #198 · 2026-03-12 · 1:14:32</div>
+                  <div class="chips"><span class="chip-sm c">Mixed</span><span class="chip-sm">2 contradictions</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">−</div>
+                <div>
+                  <div class="ttl">"NSDR can substitute for sleep loss."</div>
+                  <div class="cite">Lab #205 · 2026-04-08</div>
+                  <div class="chips"><span class="chip-sm d">Unproven</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">+</div>
+                <div>
+                  <div class="ttl">"Cold exposure increases dopamine."</div>
+                  <div class="cite">Lab #196 · 2026-02-26</div>
+                  <div class="chips"><span class="chip-sm b">Supported</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">F2</div>
+        <div class="cap">Creator profile. <em>Cream block. Each claim quoted, episode + timestamp linked, grade chip. No editorial commentary on the creator anywhere.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- F3: Claim detail -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>20:12</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Claim</span><span class="right"><span class="pill-ghost">Save</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Indexed claim · Huberman Lab #198 · 1:14:32</div>
+            <div class="quoted" style="margin: 8px 0 14px; font-size:14px;">
+              "I think taurine is one of the most underrated longevity tools we have."
+              <span class="src">Andrew Huberman · 2026-03-12</span>
+            </div>
+
+            <div class="verdict-block mixed" style="margin: 0 -18px 12px;">
+              <div class="ver">Verdict</div>
+              <h2 style="font-size:20px;">Mixed evidence.</h2>
+              <p>Strong mouse data, modest human data, no longevity RCT. The framing as "underrated longevity tool" outruns the human evidence base.</p>
+            </div>
+
+            <div class="eyebrow-mono">What backs this claim</div>
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+              <div class="ord">+</div>
+              <div>
+                <div class="ttl">Taurine deficiency drives aging</div>
+                <div class="cite">Singh · Science · 2023 · Mouse</div>
+                <div class="chips"><span class="chip-sm d">D · Animal</span></div>
+              </div>
+            </div>
+            <div class="eyebrow-mono" style="margin-top:14px;">What pushes back</div>
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+              <div class="ord">−</div>
+              <div>
+                <div class="ttl">No effect on biological-age clocks at 24 wk</div>
+                <div class="cite">Patel · Aging Cell · 2025 · RCT</div>
+                <div class="chips"><span class="chip-sm b">B · RCT</span></div>
+              </div>
+            </div>
+
+            <div class="disc">We don't rate Huberman. We rated <strong>this claim</strong>.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">F3</div>
+        <div class="cap">Claim detail. <em>Quoted with timestamp. Both supporting and contradicting receipts shown. Closing disclosure underlines the framing rule.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- F4: Compare creators on the same claim -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>20:13</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Compare</span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Same topic · taurine + healthspan</div>
+            <h2 class="h-display">What three creators have said.</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">Side-by-side. Receipts assigned to each claim, not each creator.</p>
+
+            <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px; margin-bottom:10px;">
+              <div class="eyebrow-mono">Huberman · 2026-03-12</div>
+              <p class="copy-sm" style="margin:4px 0;">"Underrated longevity tool."</p>
+              <div style="display:flex; gap:6px;"><span class="chip-sm c">Mixed</span></div>
+            </div>
+            <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px; margin-bottom:10px;">
+              <div class="eyebrow-mono">Bryan Johnson · 2026-04-02</div>
+              <p class="copy-sm" style="margin:4px 0;">"In my Blueprint stack at 2 g/day. Modest effects."</p>
+              <div style="display:flex; gap:6px;"><span class="chip-sm b">Honest framing</span><span class="chip-sm">Disclosed dose</span></div>
+            </div>
+            <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px;">
+              <div class="eyebrow-mono">Rhonda Patrick · 2026-01-18</div>
+              <p class="copy-sm" style="margin:4px 0;">"Mouse data is striking but human data is preliminary — wait for RCTs."</p>
+              <div style="display:flex; gap:6px;"><span class="chip-sm a">Calibrated</span></div>
+            </div>
+
+            <div class="disc" style="margin-top:14px;">"Calibrated" is a quality flag — claim framing matches the underlying evidence.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">F4</div>
+        <div class="cap">Compare creators on a topic. <em>Three creators, same claim, side by side. The "Calibrated" chip is the editorial reward for matching framing to evidence — earns its absence on the others.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW G — PUBLISHED STACKS (Lena, HW-4)
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow G · HW-4</div>
+      <h2>Published Stacks.</h2>
+      <p>The Dr. Lena flow. Practitioner-influencers maintain a private stack, then publish it (read-only) to subscribers — with every protocol's evidence chain attached. AppExchange-for-biohacker-protocols pattern.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- G1: Discover Stacks -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>11:52</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word">Stacks</span><span class="right"><span class="pill-ghost">Search</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Published stacks · 142 live</div>
+            <div style="display:flex; gap:6px; margin: 8px 0 14px; flex-wrap:wrap;">
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Featured</span>
+              <span class="pill-ghost">Practitioners</span>
+              <span class="pill-ghost">Researchers</span>
+              <span class="pill-ghost">Athletes</span>
+              <span class="pill-ghost">Free</span>
+            </div>
+
+            <div style="background:var(--block-pink); padding:12px; border-radius:var(--r-md); margin-bottom:10px;">
+              <div class="eyebrow-mono" style="opacity:0.72;">Featured · 14k subscribers</div>
+              <h3 style="font-size:18px; font-weight:540; margin:6px 0;">Lena's Longevity Stack</h3>
+              <p class="copy-sm" style="margin:0 0 8px;">Integrative-medicine MD. Evidence-graded protocols across longevity, hormones, metabolic. Updated monthly.</p>
+              <div style="display:flex; gap:6px;"><span class="chip-sm a">A-graded core</span><span class="chip-sm">$8/mo</span></div>
+            </div>
+
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">The Researcher's Stack — Dr. Yuki Sato</div>
+                <div class="cite">Sleep + circadian · 2.1k subs · Free</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Endurance Performance — Coach M. Reilly</div>
+                <div class="cite">Athletic · 6.8k subs · $5/mo</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:12px 0;">
+              <div class="ord">●</div>
+              <div>
+                <div class="ttl">Postpartum Recovery — Dr. P. Martín</div>
+                <div class="cite">Women's health · 4.2k subs · $5/mo</div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">G1</div>
+        <div class="cap">Discover Stacks. <em>Pink featured block. Filter chips. Each Stack shows credentialing context (researcher, MD, coach) without us validating the credential.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- G2: Lena's Stack page -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>11:52</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Lena</span><span class="right"><span class="pill-ghost">Subscribe</span></span></div>
+          <div class="body" style="padding:0 0 12px;">
+            <div style="background:var(--block-pink); padding:14px 18px 16px; margin:0 -18px 12px;">
+              <div class="eyebrow-mono" style="opacity:0.72;">Lena's Longevity Stack · v 1.4 · updated 2026-04-30</div>
+              <h2 style="font-size:24px;font-weight:540;letter-spacing:var(--t-headline);line-height:1.15;margin:6px 0 10px;">12 protocols, every claim sourced.</h2>
+              <p class="copy-sm" style="margin:0 0 8px;">Integrative-medicine MD, Toronto. 14k subscribers. Stack reviewed quarterly. <strong>No supplement-brand sponsorship.</strong></p>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;"><span class="chip-sm a">A-graded core</span><span class="chip-sm">$8/mo</span><span class="chip-sm">Free trial · 14d</span></div>
+            </div>
+            <div style="padding:0 18px;">
+              <div class="eyebrow-mono" style="margin-bottom:6px;">Stack contents</div>
+              <div class="stack-row">
+                <div class="row1"><span class="nm">Cardio prevention core</span><span class="stt run">5 protocols</span></div>
+                <div class="meta">ApoB targeting · Lp(a) workup · zone 2 · omega-3 · sleep</div>
+              </div>
+              <div class="stack-row">
+                <div class="row1"><span class="nm">Metabolic baseline</span><span class="stt tri">3 protocols</span></div>
+                <div class="meta">HbA1c · resistance training · time-restricted feeding</div>
+              </div>
+              <div class="stack-row">
+                <div class="row1"><span class="nm">Hormonal optimization</span><span class="stt psd">4 protocols</span></div>
+                <div class="meta">Thyroid panel · perimenopause · vit D · iron</div>
+              </div>
+              <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+                <div class="ord">●</div>
+                <div>
+                  <div class="ttl">Latest update — added a Lp(a) protocol</div>
+                  <div class="cite">2026-04-30 · 3 new receipts</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab active"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">G2</div>
+        <div class="cap">Lena's Stack page. <em>Subscriber view. Pink hero · 12 grouped protocols · changelog at the bottom · "no supplement-brand sponsorship" surfaced explicitly.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- G3: Subscribe confirm -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>11:53</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Subscribe</span><span class="right"><span class="pill-ghost">×</span></span></div>
+          <div class="body">
+            <h2 class="h-display">Subscribe to Lena's Stack</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">14-day free trial, then $8/month. Cancel any time from Settings. No card charged today.</p>
+
+            <div class="field-grid">
+              <div class="field"><span class="lab">Plan</span><span class="val">Stack subscription</span></div>
+              <div class="field"><span class="lab">Author</span><span class="val">Dr. Lena · MD</span></div>
+              <div class="field"><span class="lab">Updates</span><span class="val">Monthly + alerts</span></div>
+              <div class="field"><span class="lab">Trial</span><span class="val">14 days free</span></div>
+            </div>
+
+            <div class="eyebrow-mono">What you get</div>
+            <div class="takeaways" style="margin-top:6px;">
+              <ul>
+                <li><span class="b">+</span><span>Read-only access to all 12 protocols + receipts.</span></li>
+                <li><span class="b">+</span><span>Notifications when Lena updates a protocol.</span></li>
+                <li><span class="b">+</span><span>"Run this protocol" — clones to your private Stack.</span></li>
+                <li><span class="b">+</span><span>Comments are off in v1. No social. No brigading.</span></li>
+              </ul>
+            </div>
+
+            <div class="disc">Receipts takes 0% on the first $8/month per author and 10% above that. Earnings public on the author profile.</div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Cancel</a>
+            <a class="pill-dark">Start free trial</a>
+          </div>
+        </div>
+        <div class="num">G3</div>
+        <div class="cap">Subscribe confirm. <em>Trial framing, "no social" stated up front, Receipts' take rate disclosed in the footer — the trust posture extends to the marketplace.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- G4: Author mode -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>11:54</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Author · Lena</span><span class="right"><span class="pill-ghost">Preview</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Compose new protocol</div>
+            <h2 class="h-display" style="margin-bottom:8px;">Lp(a) screening &amp; management</h2>
+            <p class="copy-sm" style="margin-bottom:12px;opacity:0.78;">Editor view. Drag receipts in from the right rail.</p>
+
+            <div style="border:1px solid var(--hairline); border-radius:var(--r-md); padding:12px; margin-bottom:10px; min-height:120px;">
+              <p class="copy-sm" style="margin:0 0 8px;"><strong>What Lp(a) is.</strong> A genetic lipoprotein. Most people have never had it measured. Once is enough — it doesn't change much over a lifetime.</p>
+              <p class="copy-sm" style="margin:0;"><strong>Why it matters.</strong> Independent risk factor for early heart attack and stroke <span style="background:var(--block-lime);padding:1px 4px;border-radius:4px;font-weight:540;font-size:11px;">[r1]</span> <span style="background:var(--block-lime);padding:1px 4px;border-radius:4px;font-weight:540;font-size:11px;">[r2]</span>.</p>
+            </div>
+
+            <div class="eyebrow-mono">Receipts in this draft (3)</div>
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+              <div class="ord">r1</div>
+              <div>
+                <div class="ttl">Mendelian randomization on Lp(a) and CAD</div>
+                <div class="cite">Kamstrup · Eur Heart J · 2018</div>
+                <div class="chips"><span class="chip-sm a">A · MR</span></div>
+              </div>
+            </div>
+            <div class="r-row">
+              <div class="ord">r2</div>
+              <div>
+                <div class="ttl">ESC consensus on Lp(a)</div>
+                <div class="cite">Kronenberg · Atherosclerosis · 2022</div>
+                <div class="chips"><span class="chip-sm a">A · Guideline</span></div>
+              </div>
+            </div>
+
+            <div class="disc">Required before publish: every claim links to ≥1 allowlist source. Editorial check runs on submit.</div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Save draft</a>
+            <a class="pill-dark">Submit for review</a>
+          </div>
+        </div>
+        <div class="num">G4</div>
+        <div class="cap">Author mode. <em>Lena composing. Inline receipt tags <strong>[r1]</strong> link to entries in the rail. The "every claim → ≥1 allowlist source" rule is enforced at submit.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW H — SAFETY TRIAGE / ACUTE-CONCERN ROUTING
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow H · Safety architecture</div>
+      <h2>Acute-concern triage.</h2>
+      <p>The triage layer above the Research Agent (§13.3). Pattern-matches acute-symptom language and exits to crisis resources <strong>before</strong> the literature agent runs. False positives accepted; false negatives are not. Release-blocker.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- H1: Concerning question typed -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>23:42</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word">Receipts</span><span class="right"><span class="av">MR</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">New question</div>
+            <div class="input-bar" style="margin: 8px 0 14px; padding: 12px 14px; align-items: flex-start; min-height: 70px;">
+              <span class="lab" style="margin-top:2px;">Ask</span>
+              <span class="text">why have I been having chest pain when I exercise|</span>
+            </div>
+
+            <div class="eyebrow-mono">Receipts will check</div>
+            <div class="suggest-list" style="gap:4px; margin-top:6px;">
+              <div class="suggest" style="padding:8px 12px; font-size:12px;">PubMed · 38M abstracts</div>
+              <div class="suggest" style="padding:8px 12px; font-size:12px;">Cochrane · USPSTF · AHA</div>
+            </div>
+
+            <div class="disc">Acute symptoms are routed to triage before the literature agent runs.</div>
+          </div>
+          <div class="kb">
+            <div class="row"><div class="key">q</div><div class="key">w</div><div class="key">e</div><div class="key">r</div><div class="key">t</div><div class="key">y</div><div class="key">u</div><div class="key">i</div><div class="key">o</div><div class="key">p</div></div>
+            <div class="row"><div class="key">a</div><div class="key">s</div><div class="key">d</div><div class="key">f</div><div class="key">g</div><div class="key">h</div><div class="key">j</div><div class="key">k</div><div class="key">l</div></div>
+            <div class="row"><div class="key wide">⇧</div><div class="key">z</div><div class="key">x</div><div class="key">c</div><div class="key">v</div><div class="key">b</div><div class="key">n</div><div class="key">m</div><div class="key wide">⌫</div></div>
+            <div class="row"><div class="key wide">123</div><div class="key" style="flex:5;">space</div><div class="key wide" style="background:var(--ink);color:var(--canvas);">go</div></div>
+          </div>
+        </div>
+        <div class="num">H1</div>
+        <div class="cap">User types a worrying question. <em>Acute-symptom keywords ("chest pain when I exercise") will fire the triage layer on submit.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- H2: Triage interrupt -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>23:42</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="body" style="padding: 0; background: var(--block-coral);">
+            <div style="padding: 32px 22px 24px;">
+              <div class="eyebrow-mono" style="opacity:0.72;">Triage layer · acute-symptom pattern matched</div>
+              <h2 style="font-size:26px;font-weight:540;letter-spacing:var(--t-headline);line-height:1.15;margin:8px 0 12px;">This sounds like something for a clinician now.</h2>
+              <p class="copy-md" style="line-height:1.50;">Chest pain on exertion is the kind of symptom that doctors want to evaluate quickly. We're going to step out of literature mode for this one.</p>
+            </div>
+            <div style="background: var(--canvas); padding: 18px 22px 20px; border-top-left-radius: var(--r-lg); border-top-right-radius: var(--r-lg);">
+              <div class="eyebrow-mono">If this is happening right now</div>
+              <div style="display:flex; flex-direction:column; gap:8px; margin: 8px 0 14px;">
+                <a class="pill-dark" style="justify-content:space-between;"><span>Call 911</span><span style="opacity:0.6;">Emergency</span></a>
+                <a class="pill-light" style="justify-content:space-between;"><span>Telehealth — same-day visit</span><span style="opacity:0.6;">Sesame · Amwell</span></a>
+                <a class="pill-light" style="justify-content:space-between;"><span>Find a cardiologist near you</span><span style="opacity:0.6;">NPI directory</span></a>
+              </div>
+              <div class="eyebrow-mono">If it's already passed</div>
+              <p class="copy-sm" style="margin: 6px 0 0;">Bring it up at your next primary-care visit. We can prep questions for that conversation — but we shouldn't be your first stop here.</p>
+            </div>
+          </div>
+        </div>
+        <div class="num">H2</div>
+        <div class="cap">Triage interrupt. <em>Coral block over canvas. The literature agent <strong>does not run</strong> until the user explicitly opts back. Crisis resources are first; pre-visit prep is offered second.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- H3: Resources detail -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>23:43</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Resources</span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Acute-care resources</div>
+            <h2 class="h-display">Where to go.</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">We don't sell referrals or take placement fees. These come from public directories.</p>
+
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-md);padding:12px;margin-bottom:8px;">
+              <div class="eyebrow-mono">Emergency</div>
+              <p class="copy-sm" style="margin:6px 0 0;"><strong>911 / 112 / 999.</strong> Chest pain with shortness of breath, nausea, jaw or arm pain — don't wait.</p>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-md);padding:12px;margin-bottom:8px;">
+              <div class="eyebrow-mono">Same-day telehealth</div>
+              <p class="copy-sm" style="margin:6px 0 0;">Sesame · Amwell · Teladoc. We do not partner with any of these — directory listing only.</p>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-md);padding:12px;margin-bottom:8px;">
+              <div class="eyebrow-mono">Mental-health crisis</div>
+              <p class="copy-sm" style="margin:6px 0 0;"><strong>988 (US) · Samaritans (UK).</strong> 24/7. Free.</p>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-md);padding:12px;">
+              <div class="eyebrow-mono">Find a clinician</div>
+              <p class="copy-sm" style="margin:6px 0 0;">NPI Registry · state medical boards · OB/GYN, cardiology, primary care directories. No paid placements.</p>
+            </div>
+
+            <div class="disc" style="margin-top:14px;">Receipts uses public directories only. We are not a covered entity. We do not store your symptom query if triage fires.</div>
+          </div>
+        </div>
+        <div class="num">H3</div>
+        <div class="cap">Resources detail. <em>No paid placements anywhere — written into the disclosure. Acute-symptom queries are <strong>not stored</strong> after triage fires (privacy + liability).</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW I — ACCOUNT, PERSONALIZATION, DATA EXPORT
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow I · The "You" tab</div>
+      <h2>Account, personalization, data export.</h2>
+      <p>Five screens covering personalization (§13.2), source-library transparency, the personal Direct Data API (HW-7), one-tap export, and one-tap deletion (MH-12).</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- I1: You tab -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>8:14</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word">You</span><span class="right"><span class="premium">Premium</span></span></div>
+          <div class="body">
+            <div style="display:flex; gap:12px; align-items:center; padding: 4px 0 14px; border-bottom:1px solid var(--hairline);">
+              <div class="av" style="width:48px;height:48px;font-size:16px;background:var(--surface-soft);">MR</div>
+              <div>
+                <div style="font-size:16px;font-weight:540;">Marcus Reilly</div>
+                <div class="meta-line" style="margin-top:2px;">Premium · since 2026-02-04</div>
+              </div>
+            </div>
+
+            <div class="eyebrow-mono" style="margin: 14px 0 6px;">Personalization</div>
+            <div class="r-row" style="border-top:0; padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Detail level</div><div class="cite">Full · 200 words</div></div></div>
+            <div class="r-row" style="padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Tone</div><div class="cite">Direct</div></div></div>
+            <div class="r-row" style="padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Evidence floor</div><div class="cite">Show A–C, hide D unless asked</div></div></div>
+            <div class="r-row" style="padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Topics followed</div><div class="cite">12 · edit list</div></div></div>
+
+            <div class="eyebrow-mono" style="margin: 14px 0 6px;">Data &amp; transparency</div>
+            <div class="r-row" style="border-top:0; padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Source library</div><div class="cite">~3.2M papers indexed · last sync 9:00</div></div></div>
+            <div class="r-row" style="padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Personal Direct Data API</div><div class="cite">Off · grant your own LLM access</div></div></div>
+            <div class="r-row" style="padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Export everything</div><div class="cite">JSON + Markdown · one tap</div></div></div>
+            <div class="r-row" style="padding:8px 0;"><div class="ord">●</div><div><div class="ttl">Delete account</div><div class="cite">Confirmed receipt issued</div></div></div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab active"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">I1</div>
+        <div class="cap">You tab. <em>Personalization on top, data and transparency below. "Delete account" is in the same row hierarchy as the others — never buried.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- I2: Personalization panel -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>8:14</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Personalization</span><span class="right"><span class="pill-ghost">Save</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Detail level</div>
+            <div style="display:flex; gap:6px; margin: 6px 0 14px;">
+              <span class="pill-ghost">Gist</span>
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Full ✓</span>
+              <span class="pill-ghost">Max + cite</span>
+            </div>
+
+            <div class="eyebrow-mono">Tone</div>
+            <div style="display:flex; gap:6px; margin: 6px 0 14px;">
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Direct ✓</span>
+              <span class="pill-ghost">Encouraging</span>
+              <span class="pill-ghost">Just facts</span>
+            </div>
+
+            <div class="eyebrow-mono">Evidence floor</div>
+            <p class="copy-sm" style="margin:6px 0 6px;opacity:0.78;">What grades show by default. Lower grades are always one tap away.</p>
+            <div style="display:flex; gap:6px; margin-bottom:14px;">
+              <span class="pill-ghost">A only</span>
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">A–C ✓</span>
+              <span class="pill-ghost">All grades</span>
+            </div>
+
+            <div class="eyebrow-mono">Cadence</div>
+            <div style="display:flex; gap:6px; margin: 6px 0 14px;">
+              <span class="pill-ghost">Light-touch</span>
+              <span class="pill-ghost" style="background:var(--ink);color:var(--canvas);">Active ✓</span>
+              <span class="pill-ghost">Aggressive</span>
+            </div>
+
+            <div class="disc">Citations are never gated by any of these settings. Plain-language layer (FK ≤ 9) is always on.</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab active"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">I2</div>
+        <div class="cap">Personalization panel. <em>Detail / tone / evidence floor / cadence — all four sliders from PRD §13.2. Each is reversible, each has a default, none can suppress citations.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- I3: Source library -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>8:15</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Library</span><span class="right"><span class="meta-line">3.2M</span></span></div>
+          <div class="body">
+            <div class="eyebrow-mono">Trusted-source allowlist</div>
+            <h2 class="h-display">What Receipts will read.</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">Quarterly editorial review · public changelog · last sync 2026-05-07 06:00 UTC.</p>
+
+            <div class="r-row" style="border-top:1px solid var(--hairline);padding:10px 0;">
+              <div class="ord">A</div>
+              <div>
+                <div class="ttl">Peer-reviewed journals</div>
+                <div class="cite">PubMed · NEJM · Lancet · JAMA · BMJ · Nature · Science</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:10px 0;">
+              <div class="ord">A</div>
+              <div>
+                <div class="ttl">Systematic reviews</div>
+                <div class="cite">Cochrane Library · Campbell Collaboration</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:10px 0;">
+              <div class="ord">A</div>
+              <div>
+                <div class="ttl">Consensus bodies</div>
+                <div class="cite">USPSTF · AHA · ADA · KDIGO · Endocrine Society · NIH ODS · ACOG · WHO</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:10px 0;">
+              <div class="ord">~</div>
+              <div>
+                <div class="ttl">Preprints</div>
+                <div class="cite">bioRxiv · medRxiv · always labeled, never sole source for A–B grade</div>
+              </div>
+            </div>
+            <div class="r-row" style="padding:10px 0;">
+              <div class="ord">×</div>
+              <div>
+                <div class="ttl">Excluded</div>
+                <div class="cite">Blogs · podcasts · supplement-brand whitepapers · the open web</div>
+              </div>
+            </div>
+
+            <div class="disc">Last quarterly review: 2026-04-01. Changelog: settings.receipts.app/library/changelog</div>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab active"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">I3</div>
+        <div class="cap">Source library. <em>Transparency on what's in scope, what's labeled, what's excluded. The "× Excluded" row is the most important — written commitment, surfaced to users.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- I4: Direct Data API + export -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>8:15</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Data &amp; export</span></div>
+          <div class="body">
+            <div style="background:var(--block-lime); padding:14px 18px 14px; margin:0 -18px 14px;">
+              <div class="eyebrow-mono" style="opacity:0.72;">Personal Direct Data API · HW</div>
+              <h2 style="font-size:20px;font-weight:540;letter-spacing:var(--t-headline);line-height:1.20;margin:6px 0 6px;">Let your own LLM ground on your stack.</h2>
+              <p class="copy-sm" style="margin:0;">Read-only token. Per-scope. Revocable. Audit log on every call.</p>
+            </div>
+
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-md);padding:12px;margin-bottom:10px;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <strong style="font-size:14px;">Claude Desktop</strong>
+                <span style="display:inline-flex;align-items:center;gap:6px;font-family:JetBrains Mono;font-size:10px;letter-spacing:var(--t-mono-tight);text-transform:uppercase;"><span style="width:8px;height:8px;border-radius:var(--r-full);background:var(--block-mint);"></span>Connected</span>
+              </div>
+              <div class="meta-line" style="margin-top:4px;">Scopes: stack:read · receipts:read · n1:read</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-md);padding:12px;margin-bottom:14px;">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <strong style="font-size:14px;">+ New token</strong>
+                <span class="pill-ghost">Generate</span>
+              </div>
+            </div>
+
+            <div class="eyebrow-mono">One-tap export</div>
+            <div style="display:flex; gap:8px; margin: 6px 0 14px;">
+              <a class="pill-light">JSON</a>
+              <a class="pill-light">Markdown</a>
+              <a class="pill-dark">Download both</a>
+            </div>
+
+            <div class="eyebrow-mono">One-tap delete</div>
+            <a class="pill-light" style="border-color: var(--block-coral); background: var(--block-coral); margin-top:6px;">Delete my account</a>
+
+            <div class="disc">Deletion issues a signed receipt with a hash you can verify. Your data is gone within 24h, including from backups within 30d.</div>
+          </div>
+        </div>
+        <div class="num">I4</div>
+        <div class="cap">Data &amp; export. <em>Lime block hero on Direct Data API — the differentiator vs. Veeva/Salesforce. Coral delete pill is alarming on purpose; deletion issues a signed receipt.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- I5: Delete confirm -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>8:16</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Delete account</span><span class="right"><span class="pill-ghost">×</span></span></div>
+          <div class="body">
+            <h2 class="h-display">Are you sure?</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">No friction questions, no retention dark patterns. We're going to ask you to type <strong>delete</strong> below to confirm — that's it.</p>
+
+            <div class="eyebrow-mono">What gets deleted</div>
+            <div class="takeaways" style="margin-top:6px;">
+              <ul>
+                <li><span class="b">●</span><span>Account, email, passkey.</span></li>
+                <li><span class="b">●</span><span>All search history, saved receipts, Verify checks.</span></li>
+                <li><span class="b">●</span><span>Stack, n=1 logs, follow lists, personalization.</span></li>
+                <li><span class="b">●</span><span>Active Direct Data API tokens.</span></li>
+                <li><span class="b">●</span><span>Backups within 30 days.</span></li>
+              </ul>
+            </div>
+
+            <div class="input-bar" style="margin: 12px 0 14px;">
+              <span class="lab">Type</span>
+              <span class="text" style="opacity:0.45;">delete</span>
+            </div>
+
+            <div class="disc">A signed deletion receipt is sent to your email + downloadable here for 7 days.</div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Cancel</a>
+            <a class="pill-dark" style="background:var(--block-coral);color:var(--ink);">Delete forever</a>
+          </div>
+        </div>
+        <div class="num">I5</div>
+        <div class="cap">Delete confirm. <em>No retention dark patterns. Type-to-confirm. Signed receipt issued. Everything deleted within 24h, backups within 30d.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW J — PREMIUM UPGRADE
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow J · Commercial</div>
+      <h2>Premium upgrade.</h2>
+      <p>The free→premium prompt only fires on a value-relevant ceiling — never on a safety surface. Citations are never gated. Premium is throughput and depth, not access to truth.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- J1: Free-tier ceiling hit -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>16:48</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word">Verify</span><span class="right"><span class="meta-line">0 left today</span></span></div>
+          <div class="body">
+            <div style="background:var(--block-cream); padding:14px 18px 16px; margin: 0 -18px 14px;">
+              <div class="eyebrow-mono" style="opacity:0.72;">Free-tier limit</div>
+              <h2 style="font-size:22px;font-weight:540;letter-spacing:var(--t-headline);line-height:1.18;margin:6px 0 6px;">You've used your 5 Verifies for today.</h2>
+              <p class="copy-sm" style="margin:0;">Resets at midnight. Or upgrade for unlimited Verify, longer Stack, and the weekly digest.</p>
+            </div>
+
+            <div class="eyebrow-mono">Today's Verifies</div>
+            <div class="r-row" style="border-top:1px solid var(--hairline); padding-top:10px;"><div class="ord">●</div><div><div class="ttl">"Mouth-taping improves sleep"</div><div class="chips" style="margin-top:4px;"><span class="chip-sm c">Mixed</span></div></div></div>
+            <div class="r-row"><div class="ord">●</div><div><div class="ttl">"Magnesium prevents migraine"</div><div class="chips" style="margin-top:4px;"><span class="chip-sm b">Supported</span></div></div></div>
+            <div class="r-row"><div class="ord">●</div><div><div class="ttl">"AG1 transforms gut microbiome"</div><div class="chips" style="margin-top:4px;"><span class="chip-sm c">Mixed</span></div></div></div>
+            <div class="r-row"><div class="ord">●</div><div><div class="ttl">"Saturated fat is fine for ApoB"</div><div class="chips" style="margin-top:4px;"><span class="chip-sm d">Contradicted</span></div></div></div>
+            <div class="r-row"><div class="ord">●</div><div><div class="ttl">"Sauna replaces cardio"</div><div class="chips" style="margin-top:4px;"><span class="chip-sm c">Mixed</span></div></div></div>
+
+            <div class="disc">Search and topic browsing remain free. Citations are never paywalled.</div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Wait til tomorrow</a>
+            <a class="pill-dark">See premium</a>
+          </div>
+          <div class="tabbar">
+            <div class="tab"><div class="ic">●</div>Ask</div>
+            <div class="tab active"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">J1</div>
+        <div class="cap">Free-tier ceiling. <em>Cream block, honest framing — the user's 5 Verifies surfaced as a recap. "Wait til tomorrow" is a real option, not a dark-pattern no-button.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- J2: Pricing -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>16:48</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Premium</span></div>
+          <div class="body">
+            <h2 class="h-display">$60 a year. That's it.</h2>
+            <p class="copy-sm" style="margin-bottom:14px;">No tiers. No add-ons. No "essentials" upsell on top. We don't sell supplements — this is how we keep the lights on.</p>
+
+            <div style="border:2px solid var(--ink); border-radius:var(--r-md); padding:14px; margin-bottom:14px; background: var(--block-lilac);">
+              <div class="eyebrow-mono">Premium</div>
+              <div style="font-size:36px;font-weight:540;letter-spacing:var(--t-display);line-height:1;margin:6px 0;">$60<span style="font-size:14px;font-weight:330;opacity:0.7;"> /yr</span></div>
+              <ul style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                <li class="copy-sm">● Unlimited Verify</li>
+                <li class="copy-sm">● Unlimited Stack + n=1 history</li>
+                <li class="copy-sm">● Weekly digest on followed topics</li>
+                <li class="copy-sm">● Contradiction alerts on your protocols</li>
+                <li class="copy-sm">● Personal Direct Data API (HW)</li>
+                <li class="copy-sm">● Voice surface (HW)</li>
+                <li class="copy-sm">● Custom agent / prompt builder (HW)</li>
+              </ul>
+            </div>
+
+            <div class="eyebrow-mono">Stays free, always</div>
+            <div class="takeaways" style="margin-top:6px;">
+              <ul>
+                <li><span class="b">●</span><span>Search and Ask.</span></li>
+                <li><span class="b">●</span><span>All 200 curated topic pages.</span></li>
+                <li><span class="b">●</span><span>5 Verifies/day.</span></li>
+                <li><span class="b">●</span><span>Stack with up to 5 active protocols.</span></li>
+                <li><span class="b">●</span><span><strong>Citations. Always. Forever.</strong></span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Maybe later</a>
+            <a class="pill-dark">Upgrade · $60</a>
+          </div>
+        </div>
+        <div class="num">J2</div>
+        <div class="cap">Pricing. <em>One tier. Lilac block. Both the upgrade and the always-free list visible together — the trust frame is "premium is depth, not access."</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- J3: Confirmation -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>16:49</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="body" style="display:flex; flex-direction:column; padding: 36px 22px 22px; background: var(--block-mint);">
+            <div>
+              <div class="eyebrow-mono" style="opacity:0.72;">Welcome to premium</div>
+              <h1 style="font-size:30px;font-weight:540;letter-spacing:var(--t-display);line-height:1.10;margin: 8px 0 10px;">You're in.</h1>
+              <p class="copy-md" style="line-height:1.50;">Receipt sent to your email. First charge $60 today, renews 2027-05-07. Cancel any time from Settings.</p>
+            </div>
+
+            <div style="background:var(--canvas);border-radius:var(--r-md);padding:14px;margin-top:18px;">
+              <div class="eyebrow-mono">Try these now</div>
+              <div class="suggest-list" style="margin-top:6px;">
+                <div class="suggest" style="padding:10px 12px;">Verify a claim — no daily limit <span class="arrow">→</span></div>
+                <div class="suggest" style="padding:10px 12px;">Schedule your Monday digest <span class="arrow">→</span></div>
+                <div class="suggest" style="padding:10px 12px;">Connect your own LLM (HW) <span class="arrow">→</span></div>
+                <div class="suggest" style="padding:10px 12px;">Build a custom agent (HW) <span class="arrow">→</span></div>
+              </div>
+            </div>
+
+            <a class="pill-dark" style="justify-content:center; margin-top:18px;">Back to Receipts</a>
+          </div>
+        </div>
+        <div class="num">J3</div>
+        <div class="cap">Confirmation. <em>Mint full-bleed. No confetti. No upsell add-ons. Suggested first actions list HW items honestly labeled — no overpromising what ships day one.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =====================================================
+       FLOW K — VOICE SURFACE (HW-8)
+       ===================================================== -->
+  <section class="flow">
+    <div class="flow-head">
+      <div class="label">Flow K · HW-8</div>
+      <h2>Voice surface.</h2>
+      <p>"Hey Receipts, what's the evidence on …" — Atlas-pattern reasoning loop with TTS readout. Hands-free for the run, the kitchen, the school pickup. Receipts read aloud in plain English; full chain available on screen.</p>
+    </div>
+
+    <div class="frames">
+
+      <!-- K1: Voice idle -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>7:02</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">← Voice</span><span class="right"><span class="pill-ghost">Settings</span></span></div>
+          <div class="body" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding-top:60px;">
+            <div style="width:120px; height:120px; border-radius:var(--r-full); background:var(--block-lilac); display:flex; align-items:center; justify-content:center; margin-bottom:24px;">
+              <div style="font-family:JetBrains Mono;font-size:14px;font-weight:500;letter-spacing:var(--t-mono);">●</div>
+            </div>
+            <h2 class="h-display" style="margin-bottom:8px;">Tap to ask.</h2>
+            <p class="copy-sm" style="max-width:32ch; opacity:0.78; margin-bottom:24px;">Say anything. We'll ground in your library and read the answer back. Hands-free.</p>
+
+            <div class="eyebrow-mono" style="margin-bottom:8px;">Try</div>
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:stretch; width:100%;">
+              <div class="suggest">"Is creatine safe long-term?" <span class="arrow">●</span></div>
+              <div class="suggest">"What did Huberman say about taurine?" <span class="arrow">●</span></div>
+              <div class="suggest">"Read me my Stack." <span class="arrow">●</span></div>
+            </div>
+          </div>
+          <div class="tabbar">
+            <div class="tab active"><div class="ic">●</div>Ask</div>
+            <div class="tab"><div class="ic">◇</div>Verify</div>
+            <div class="tab"><div class="ic">≡</div>Topics</div>
+            <div class="tab"><div class="ic">◐</div>Stack</div>
+            <div class="tab"><div class="ic">◯</div>You</div>
+          </div>
+        </div>
+        <div class="num">K1</div>
+        <div class="cap">Voice idle. <em>Lilac orb is the affordance. Suggestion list mirrors text Ask but reads aloud. "Read me my Stack" is the hands-free check-in.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- K2: Listening -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>7:02</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Listening</span><span class="right"><span class="meta-line">●</span></span></div>
+          <div class="body" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding-top:50px;">
+            <div style="display:flex; align-items:flex-end; gap:6px; height:80px; margin-bottom:24px;">
+              <span style="display:inline-block;width:8px;height:30px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:60px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:48px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:72px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:36px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:54px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:24px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:40px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:62px;background:var(--ink);border-radius:4px;"></span>
+              <span style="display:inline-block;width:8px;height:28px;background:var(--ink);border-radius:4px;"></span>
+            </div>
+
+            <div class="eyebrow-mono" style="margin-bottom:6px;">Transcribing</div>
+            <p style="font-size:18px;font-weight:330;letter-spacing:var(--t-headline);line-height:1.35;max-width:30ch;">"What's the evidence on creatine for cognition in older adults…"</p>
+
+            <p class="disc" style="max-width:34ch; margin-top:24px;">Audio is processed locally on iOS 26+. Full transcript saved only if you tap Save.</p>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light" style="flex:1;justify-content:center;">Cancel</a>
+            <a class="pill-dark" style="flex:1;justify-content:center;">Done</a>
+          </div>
+        </div>
+        <div class="num">K2</div>
+        <div class="cap">Listening. <em>Live transcript reassures the user. Local-on-device transcription noted in disclosure — privacy is part of the surface, not buried in TOS.</em></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+
+      <!-- K3: Voice answer -->
+      <div class="step">
+        <div class="phone">
+          <div class="status"><span>7:03</span><span class="dots"><span></span><span></span><span></span></span></div>
+          <div class="nav-top"><span class="word" style="font-size:14px;">Reading aloud</span><span class="right"><span class="meta-line">▮▮ pause</span></span></div>
+          <div class="body" style="padding:0 0 12px;">
+            <div class="lilac-hero" style="margin:0;">
+              <div class="meta-line" style="opacity:0.72;">Voice answer · 12s</div>
+              <h2 style="font-size:20px;">Creatine for cognition in older adults</h2>
+              <div class="grade-row">
+                <span class="grade-pill"><span class="grade-letter">A</span>Strong</span>
+                <span class="meta-pill">7 sources</span>
+              </div>
+              <p style="font-size:14px;font-weight:330;line-height:1.55;">
+                <strong>Reading:</strong> "Creatine — most studied at 5 grams per day — has strong evidence for working-memory and reasoning improvements in older adults. Effects are modest but reproducible. Generally well-tolerated. The bigger benefits show up after 8 to 12 weeks."
+              </p>
+            </div>
+            <div style="padding: 12px 18px 0;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                <div style="flex:1; height:4px; background: var(--surface-soft); border-radius:var(--r-full); position:relative;">
+                  <div style="position:absolute; left:0; top:0; bottom:0; width:42%; background:var(--ink); border-radius:var(--r-full);"></div>
+                </div>
+                <span class="meta-line">0:08 / 0:19</span>
+              </div>
+
+              <div class="eyebrow-mono" style="margin-bottom:6px;">Full receipts (3)</div>
+              <div class="r-row" style="border-top:1px solid var(--hairline);padding-top:10px;">
+                <div class="ord">01</div>
+                <div>
+                  <div class="ttl">Creatine + cognition: meta-analysis</div>
+                  <div class="cite">Forbes · Nutrients · 2023 · 16 RCTs</div>
+                  <div class="chips"><span class="chip-sm a">A · Meta</span></div>
+                </div>
+              </div>
+              <div class="r-row">
+                <div class="ord">02</div>
+                <div>
+                  <div class="ttl">Creatine in 60+ adults: working memory RCT</div>
+                  <div class="cite">McMorris · Psychopharmacology · 2007</div>
+                  <div class="chips"><span class="chip-sm b">B · RCT</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-bottom-cta">
+            <a class="pill-light">Save</a>
+            <a class="pill-dark">+ Add to Stack</a>
+          </div>
+        </div>
+        <div class="num">K3</div>
+        <div class="cap">Voice answer. <em>TTS playback bar with timestamp; receipts visible on screen for when the user wants to drill in. Same Atlas loop and same grading rubric as text Ask — voice is just a different surface.</em></div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="global">
+    Receipts · Mobile flows v0.2 · 11 flows · 44 screens · 2026-05-07
+  </footer>
+
+</main>
+
+</body>
+</html>
