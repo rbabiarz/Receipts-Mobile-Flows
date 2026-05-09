@@ -506,6 +506,7 @@ interface AppState {
   addAnswer: (a: Answer) => Promise<void>;
   addVerify: (v: VerifyResult) => Promise<void>;
   toggleFollowTopic: (id: string) => Promise<void>;
+  upgradeToPremium: () => Promise<void>;
 }
 
 const AppContext = createContext<AppState | null>(null);
@@ -631,6 +632,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const upgradeToPremium = useCallback(async () => {
+    setUserState((prev) => {
+      const next = { ...prev, isPremium: true };
+      AsyncStorage.setItem("user", JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
   if (!loaded) return null;
 
   return (
@@ -653,6 +662,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addAnswer,
         addVerify,
         toggleFollowTopic,
+        upgradeToPremium,
       }}
     >
       {children}

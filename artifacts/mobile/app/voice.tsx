@@ -175,7 +175,7 @@ export default function Voice() {
         <View style={[styles.orb, styles.orbSmall, { backgroundColor: "#c8e6cd", marginTop: 24 }]}>
           <Text style={{ fontSize: 20 }}>▶</Text>
         </View>
-        <Text style={styles.tapTitle} style={{ fontSize: 14, marginTop: 12 }}>Playing</Text>
+        <Text style={[styles.tapTitle, { fontSize: 14, marginTop: 12 }]}>Playing</Text>
         <PillButton
           label="View full answer with receipts →"
           variant="light"

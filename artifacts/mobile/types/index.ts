@@ -143,4 +143,5 @@ export interface UserProfile {
   evidenceFloor: EvidenceFloor;
   topics: string[];
   joinedAt: string;
+  isPremium?: boolean;
 }

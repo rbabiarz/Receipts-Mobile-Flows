@@ -284,7 +284,7 @@ export default function Onboarding() {
         <Text style={styles.stepSub}>
           Free tier covers unlimited search and 5 Verifies a day. Citations are never paywalled.
         </Text>
-        <Text style={styles.sectionLabel} style={{ marginTop: 16, marginBottom: 8 }}>Try one of these</Text>
+        <Text style={[styles.sectionLabel, { marginTop: 16, marginBottom: 8 }]}>Try one of these</Text>
         {[
           "Should I take creatine for cognition?",
           "Is mouth-taping safe?",

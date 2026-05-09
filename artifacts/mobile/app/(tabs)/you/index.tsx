@@ -232,6 +232,18 @@ export default function YouScreen() {
           <Text style={[styles.joinDate, { color: "#ffffff", opacity: 0.55 }]}>
             Member since {user.joinedAt.split("-")[0]}
           </Text>
+          {user.isPremium ? (
+            <View style={[styles.premiumBadge, { marginTop: 6, alignSelf: "flex-start" }]}>
+              <Text style={styles.premiumText}>Premium</Text>
+            </View>
+          ) : (
+            <Pressable
+              onPress={() => router.push("/premium")}
+              style={styles.upgradeInline}
+            >
+              <Text style={styles.upgradeInlineText}>Upgrade · $60/yr →</Text>
+            </Pressable>
+          )}
         </HeroBlock>
 
         <View style={styles.statsRow}>
