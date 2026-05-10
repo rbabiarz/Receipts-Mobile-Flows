@@ -7,6 +7,12 @@ import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet } from "react-native";
 
+/**
+ * expo-router `NativeTabs` (liquid glass) has regressed navigation with nested
+ * stack screens on some iOS builds. Keep classic tabs until native tabs are stable.
+ */
+const USE_LIQUID_GLASS_NATIVE_TABS = false;
+
 function NativeTabLayout() {
   return (
     <NativeTabs>
@@ -134,7 +140,11 @@ function ClassicTabLayout() {
 }
 
 export default function TabLayout() {
-  if (isLiquidGlassAvailable()) {
+  if (
+    USE_LIQUID_GLASS_NATIVE_TABS &&
+    Platform.OS === "ios" &&
+    isLiquidGlassAvailable()
+  ) {
     return <NativeTabLayout />;
   }
   return <ClassicTabLayout />;

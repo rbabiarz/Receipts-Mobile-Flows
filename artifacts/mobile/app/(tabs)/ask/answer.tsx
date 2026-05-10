@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Animated,
   Platform,
@@ -18,6 +18,7 @@ import { LoaderStage } from "@/components/LoaderStage";
 import { MonoLabel } from "@/components/MonoLabel";
 import { PillButton } from "@/components/PillButton";
 import { ReceiptRow } from "@/components/ReceiptRow";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { Answer, GradeLevel, Receipt } from "@/types";
 
@@ -98,6 +99,7 @@ export default function AnswerScreen() {
   const [stage, setStage] = useState<Stage>("reasoning");
   const [currentStep, setCurrentStep] = useState(0);
   const [expandedReceipt, setExpandedReceipt] = useState<string | null>(null);
+  const [saveBusy, setSaveBusy] = useState(false);
 
   const answerData: Partial<Answer> = MOCK_ANSWERS.default;
 
@@ -124,13 +126,51 @@ export default function AnswerScreen() {
     });
   }
 
+  const handleSave = useCallback(async () => {
+    if (saveBusy) return;
+    setSaveBusy(true);
+    try {
+      const answer: Answer = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+        question: q ?? "",
+        grade: answerData.grade!,
+        gradeLabel: answerData.gradeLabel!,
+        headline: answerData.headline!,
+        summary: answerData.summary!,
+        takeaways: answerData.takeaways!,
+        receipts: answerData.receipts!,
+        contradictions: answerData.contradictions!,
+        timestamp: new Date().toISOString(),
+        duration: answerData.duration!,
+        sourceCount: answerData.sourceCount!,
+      };
+      await addAnswer(answer);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.back();
+    } finally {
+      setSaveBusy(false);
+    }
+  }, [
+    addAnswer,
+    answerData.contradictions,
+    answerData.duration,
+    answerData.grade,
+    answerData.gradeLabel,
+    answerData.headline,
+    answerData.receipts,
+    answerData.sourceCount,
+    answerData.summary,
+    answerData.takeaways,
+    q,
+  ]);
+
   if (stage === "reasoning") {
     return (
       <View style={styles.container}>
         <View
           style={[
             styles.header,
-            { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+            { paddingTop: getScreenTopPadding(insets.top) },
           ]}
         >
           <Pressable onPress={() => router.back()}>
@@ -168,14 +208,16 @@ export default function AnswerScreen() {
       <View
         style={[
           styles.header,
-          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+          { paddingTop: getScreenTopPadding(insets.top) },
         ]}
       >
         <Pressable onPress={() => router.back()}>
           <Text style={styles.backBtn}>← Ask</Text>
         </Pressable>
         <View style={styles.headerRight}>
-          <MonoLabel>{answerData.sourceCount} sources · {answerData.duration}</MonoLabel>
+          <MonoLabel style={styles.headerMeta}>
+            {answerData.sourceCount} sources · {answerData.duration}
+          </MonoLabel>
         </View>
       </View>
 
@@ -278,7 +320,9 @@ export default function AnswerScreen() {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
             }
           >
-            <Text style={styles.feedbackLabel}>Was this graded correctly?</Text>
+            <Text style={styles.feedbackLabel}>
+              Was this graded correctly?
+            </Text>
             <View style={styles.feedbackBtns}>
               <Pressable style={styles.feedbackBtn}>
                 <Text style={styles.feedbackBtnText}>Too high</Text>
@@ -303,24 +347,8 @@ export default function AnswerScreen() {
         <PillButton
           label="Save"
           variant="light"
-          onPress={() => {
-            const answer: Answer = {
-              id: Date.now().toString(),
-              question: q ?? "",
-              grade: answerData.grade!,
-              gradeLabel: answerData.gradeLabel!,
-              headline: answerData.headline!,
-              summary: answerData.summary!,
-              takeaways: answerData.takeaways!,
-              receipts: answerData.receipts!,
-              contradictions: answerData.contradictions!,
-              timestamp: new Date().toISOString(),
-              duration: answerData.duration!,
-              sourceCount: answerData.sourceCount!,
-            };
-            addAnswer(answer);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          }}
+          onPress={() => void handleSave()}
+          loading={saveBusy}
           flex
         />
         <PillButton
@@ -344,7 +372,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: "#e6e6e6",
   },
-  headerRight: { flexDirection: "row", alignItems: "center", gap: 8 },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    flex: 1,
+    marginLeft: 12,
+  },
+  headerMeta: { textAlign: "right" },
   backBtn: { fontFamily: "Inter_400Regular", fontSize: 14, opacity: 0.6 },
   questionBand: {
     backgroundColor: "#f7f7f5",
@@ -475,6 +510,7 @@ const styles = StyleSheet.create({
   },
   feedbackRow: {
     gap: 8,
+    alignItems: "flex-start",
   },
   feedbackLabel: {
     fontFamily: "Inter_400Regular",
@@ -483,6 +519,8 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     opacity: 0.62,
     marginBottom: 6,
+    textAlign: "left",
+    width: "100%",
   },
   feedbackBtns: { flexDirection: "row", gap: 6 },
   feedbackBtn: {
@@ -501,5 +539,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     borderTopColor: "#e6e6e6",
     backgroundColor: "#ffffff",
+    ...(Platform.OS === "web"
+      ? ({ zIndex: 2 } as const)
+      : {}),
   },
 });

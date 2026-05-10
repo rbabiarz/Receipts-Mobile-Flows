@@ -532,7 +532,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     "rapamycin",
     "creatine",
   ]);
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     async function loadState() {
@@ -561,7 +560,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {
         // ignore
       }
-      setLoaded(true);
     }
     loadState();
   }, []);
@@ -607,11 +605,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addAnswer = useCallback(async (a: Answer) => {
+    let next: Answer[] = [];
     setSavedAnswers((prev) => {
-      const next = [a, ...prev];
-      AsyncStorage.setItem("savedAnswers", JSON.stringify(next));
+      next = [a, ...prev];
       return next;
     });
+    await AsyncStorage.setItem("savedAnswers", JSON.stringify(next));
   }, []);
 
   const addVerify = useCallback(async (v: VerifyResult) => {
@@ -639,8 +638,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
   }, []);
-
-  if (!loaded) return null;
 
   return (
     <AppContext.Provider

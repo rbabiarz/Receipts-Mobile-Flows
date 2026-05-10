@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { GradeChip } from "@/components/GradeChip";
 import { MonoLabel } from "@/components/MonoLabel";
 import { PillButton } from "@/components/PillButton";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { Protocol, StackStatus } from "@/types";
 
@@ -38,7 +39,7 @@ export default function StackHome() {
       <View
         style={[
           styles.topBar,
-          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+          { paddingTop: getScreenTopPadding(insets.top) },
         ]}
       >
         <Text style={styles.title}>My Stack</Text>

@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { HeroBlock } from "@/components/HeroBlock";
 import { MonoLabel } from "@/components/MonoLabel";
 import { ReceiptRow } from "@/components/ReceiptRow";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { VerdictType } from "@/types";
 
@@ -38,7 +39,7 @@ export default function ReceiptDetail() {
   if (!result) {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => router.back()}>
             <Text style={styles.backBtn}>← Verify</Text>
           </Pressable>
@@ -57,7 +58,7 @@ export default function ReceiptDetail() {
       <View
         style={[
           styles.header,
-          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+          { paddingTop: getScreenTopPadding(insets.top) },
         ]}
       >
         <Pressable onPress={() => router.back()}>

@@ -7,13 +7,15 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { MonoLabel } from "@/components/MonoLabel";
 import { PillButton } from "@/components/PillButton";
+import { TextField } from "@/components/TextField";
+import { designTokens } from "@/constants/designTokens";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { VerdictType } from "@/types";
 
@@ -48,7 +50,7 @@ export default function VerifyHome() {
       <View
         style={[
           styles.topBar,
-          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+          { paddingTop: getScreenTopPadding(insets.top) },
         ]}
       >
         <Text style={styles.title}>Verify</Text>
@@ -71,12 +73,11 @@ export default function VerifyHome() {
         <View style={styles.inputSection}>
           <MonoLabel style={{ marginBottom: 6 }}>Claim</MonoLabel>
           <View style={styles.inputArea}>
-            <TextInput
+            <TextField
               style={styles.inputText}
               value={claim}
               onChangeText={setClaim}
               placeholder={`"Cold exposure boosts testosterone significantly."`}
-              placeholderTextColor="rgba(0,0,0,0.35)"
               multiline
               numberOfLines={4}
               textAlignVertical="top"
@@ -84,10 +85,9 @@ export default function VerifyHome() {
           </View>
           <View style={styles.sourceRow}>
             <MonoLabel size={9}>Source (optional)</MonoLabel>
-            <TextInput
+            <TextField
               style={styles.sourceInput}
               placeholder="Podcast, Instagram, article…"
-              placeholderTextColor="rgba(0,0,0,0.35)"
             />
           </View>
         </View>
@@ -183,17 +183,24 @@ const styles = StyleSheet.create({
   },
   inputArea: {
     borderWidth: 1,
-    borderColor: "#e6e6e6",
-    borderRadius: 10,
-    padding: 12,
+    borderColor: designTokens.colors.hairline,
+    borderRadius: designTokens.radii.md,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     marginBottom: 10,
     minHeight: 90,
+    backgroundColor: designTokens.colors.canvas,
   },
   inputText: {
-    fontFamily: "Inter_400Regular",
+    flex: 1,
+    minHeight: 72,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    paddingHorizontal: 0,
+    paddingVertical: 0,
     fontSize: 14,
-    color: "#000000",
     lineHeight: 22,
+    textAlignVertical: "top",
   },
   sourceRow: {
     flexDirection: "row",
@@ -205,9 +212,8 @@ const styles = StyleSheet.create({
   },
   sourceInput: {
     flex: 1,
-    fontFamily: "Inter_400Regular",
-    fontSize: 12,
-    color: "#000000",
+    minWidth: 0,
+    fontSize: 13,
   },
   actions: {
     paddingHorizontal: 18,

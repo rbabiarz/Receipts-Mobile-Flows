@@ -14,6 +14,7 @@ import { MonoLabel } from "@/components/MonoLabel";
 import { HeroBlock } from "@/components/HeroBlock";
 import { PillButton } from "@/components/PillButton";
 import { ReceiptRow } from "@/components/ReceiptRow";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { Creator, VerdictType } from "@/types";
 
@@ -34,7 +35,7 @@ export default function Influencers() {
     if (claim) {
       return (
         <View style={styles.container}>
-          <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+          <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
             <Pressable onPress={() => setSelectedClaim(null)}>
               <Text style={styles.backBtn}>← {selected.name}</Text>
             </Pressable>
@@ -72,7 +73,7 @@ export default function Influencers() {
 
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => setSelected(null)}>
             <Text style={styles.backBtn}>← Influencers</Text>
           </Pressable>
@@ -122,7 +123,7 @@ export default function Influencers() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+      <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
         <Pressable onPress={() => router.back()}>
           <Text style={styles.backBtn}>← Topics</Text>
         </Pressable>

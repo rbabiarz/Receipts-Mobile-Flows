@@ -15,6 +15,7 @@ import { GradeChip } from "@/components/GradeChip";
 import { HeroBlock } from "@/components/HeroBlock";
 import { MonoLabel } from "@/components/MonoLabel";
 import { PillButton } from "@/components/PillButton";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { PublishedStack } from "@/types";
 
@@ -39,7 +40,7 @@ export default function PublishedStacks() {
   if (selected && confirming) {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => setConfirming(false)}>
             <Text style={styles.backBtn}>← {selected.title}</Text>
           </Pressable>
@@ -86,7 +87,7 @@ export default function PublishedStacks() {
   if (selected) {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => { setSelected(null); setSubscribed(false); }}>
             <Text style={styles.backBtn}>← Stacks</Text>
           </Pressable>
@@ -163,7 +164,7 @@ export default function PublishedStacks() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+      <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
         <Pressable onPress={() => router.back()}>
           <Text style={styles.backBtn}>← Topics</Text>
         </Pressable>

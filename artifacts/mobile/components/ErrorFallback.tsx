@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useColors } from "@/hooks/useColors";
 
 export type ErrorFallbackProps = {
@@ -58,7 +59,7 @@ export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
           style={({ pressed }) => [
             styles.topButton,
             {
-              top: insets.top + 16,
+              top: getScreenTopPadding(insets.top) + 16,
               backgroundColor: colors.card,
               opacity: pressed ? 0.8 : 1,
             },

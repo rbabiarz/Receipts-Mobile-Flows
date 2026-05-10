@@ -7,13 +7,14 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { PillButton } from "@/components/PillButton";
 import { MonoLabel } from "@/components/MonoLabel";
+import { PillButton } from "@/components/PillButton";
+import { TextField } from "@/components/TextField";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { Protocol } from "@/types";
 
@@ -82,12 +83,11 @@ export default function AddToStack() {
         <MonoLabel size={9} style={{ width: 70 }}>
           {label}
         </MonoLabel>
-        <TextInput
+        <TextField
           style={styles.fieldInput}
           value={value}
           onChangeText={onChange}
           placeholder={placeholder}
-          placeholderTextColor="rgba(0,0,0,0.35)"
         />
       </View>
     );
@@ -99,7 +99,7 @@ export default function AddToStack() {
         style={[
           styles.header,
           {
-            paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0),
+            paddingTop: getScreenTopPadding(insets.top),
           },
         ]}
       >
@@ -123,12 +123,11 @@ export default function AddToStack() {
 
         <View style={styles.card}>
           <MonoLabel style={{ marginBottom: 10 }}>Protocol details</MonoLabel>
-          <TextInput
+          <TextField
             style={styles.nameInput}
             value={name}
             onChangeText={setName}
             placeholder="Protocol name"
-            placeholderTextColor="rgba(0,0,0,0.35)"
           />
         </View>
 
@@ -233,7 +232,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     letterSpacing: -0.26,
     color: "#000000",
-    paddingVertical: 4,
+    marginTop: 4,
   },
   fieldRow: {
     flexDirection: "row",
@@ -245,9 +244,12 @@ const styles = StyleSheet.create({
   },
   fieldInput: {
     flex: 1,
-    fontFamily: "Inter_400Regular",
-    fontSize: 13,
-    color: "#000000",
+    minWidth: 0,
+    fontSize: 14,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    paddingHorizontal: 0,
+    paddingVertical: 4,
   },
   guideCard: {
     marginHorizontal: 18,

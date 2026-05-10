@@ -11,6 +11,7 @@ interface Props {
 export function MonoLabel({ children, style, opacity = 0.62, size = 10 }: Props) {
   return (
     <Text
+      selectable={false}
       style={[
         styles.base,
         { opacity, fontSize: size },

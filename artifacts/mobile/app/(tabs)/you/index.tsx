@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { HeroBlock } from "@/components/HeroBlock";
 import { MonoLabel } from "@/components/MonoLabel";
 import { PillButton } from "@/components/PillButton";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { DetailLevel, EvidenceFloor, ToneType } from "@/types";
 
@@ -59,7 +60,7 @@ export default function YouScreen() {
   if (section === "personalization") {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => setSection("home")}>
             <Text style={styles.backBtn}>← You</Text>
           </Pressable>
@@ -122,7 +123,7 @@ export default function YouScreen() {
   if (section === "sources") {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => setSection("home")}>
             <Text style={styles.backBtn}>← You</Text>
           </Pressable>
@@ -155,7 +156,7 @@ export default function YouScreen() {
   if (section === "data") {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => setSection("home")}>
             <Text style={styles.backBtn}>← You</Text>
           </Pressable>
@@ -214,7 +215,7 @@ export default function YouScreen() {
       <View
         style={[
           styles.topBar,
-          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+          { paddingTop: getScreenTopPadding(insets.top) },
         ]}
       >
         <Text style={styles.title}>You</Text>
@@ -270,6 +271,11 @@ export default function YouScreen() {
               label: "Source library",
               meta: "PubMed, Cochrane, bioRxiv",
               onPress: () => setSection("sources"),
+            },
+            {
+              label: "Saved answers",
+              meta: `${savedAnswers.length} in your library`,
+              onPress: () => router.push("/(tabs)/you/saved-answers"),
             },
             {
               label: "Data & export",

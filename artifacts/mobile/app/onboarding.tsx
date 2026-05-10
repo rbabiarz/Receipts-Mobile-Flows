@@ -8,12 +8,14 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PillButton } from "@/components/PillButton";
+import { TextField } from "@/components/TextField";
+import { designTokens } from "@/constants/designTokens";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 
 const ALL_TOPICS = [
@@ -37,6 +39,7 @@ const ALL_TOPICS = [
 type DetailLevel = "gist" | "full" | "max";
 
 export default function Onboarding() {
+  const insets = useSafeAreaInsets();
   const { setHasOnboarded, setUser } = useApp();
   const [step, setStep] = useState(0);
   const [email, setEmail] = useState("");
@@ -48,6 +51,16 @@ export default function Onboarding() {
     "Supplements",
   ]);
   const [detailLevel, setDetailLevel] = useState<DetailLevel>("full");
+
+  const screenShellStyle = [
+    styles.container,
+    {
+      paddingTop: getScreenTopPadding(insets.top),
+      paddingBottom: insets.bottom,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+    },
+  ];
 
   function toggleTopic(t: string) {
     setSelectedTopics((prev) =>
@@ -69,7 +82,7 @@ export default function Onboarding() {
 
   if (step === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={screenShellStyle}>
         <View style={styles.splashContent}>
           <View>
             <Text style={styles.eyebrow}>Receipts</Text>
@@ -86,13 +99,13 @@ export default function Onboarding() {
             </Text>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (step === 1) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={screenShellStyle}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
@@ -110,15 +123,14 @@ export default function Onboarding() {
             </Text>
             <View style={styles.inputBar}>
               <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                style={styles.inputText}
+              <TextField
+                style={styles.inputTextEmbed}
                 value={email}
                 onChangeText={setEmail}
                 placeholder="you@example.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
-                placeholderTextColor="rgba(0,0,0,0.35)"
               />
             </View>
             <View style={styles.socialRow}>
@@ -146,13 +158,13 @@ export default function Onboarding() {
             <PillButton label="Send code" onPress={next} flex />
           </View>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (step === 2) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={screenShellStyle}>
         <View style={styles.stepHeader}>
           <Pressable onPress={() => setStep(1)}>
             <Text style={styles.backBtn}>← Back</Text>
@@ -196,7 +208,7 @@ export default function Onboarding() {
           <PillButton label="Skip" variant="light" onPress={next} flex />
           <PillButton label="Continue" onPress={next} flex />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -223,7 +235,7 @@ export default function Onboarding() {
     ];
 
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={screenShellStyle}>
         <View style={styles.stepHeader}>
           <Pressable onPress={() => setStep(2)}>
             <Text style={styles.backBtn}>← Back</Text>
@@ -269,12 +281,12 @@ export default function Onboarding() {
           <PillButton label="Back" variant="light" onPress={() => setStep(2)} flex />
           <PillButton label="Continue" onPress={next} flex />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={screenShellStyle}>
       <View style={styles.stepHeader}>
         <Text style={styles.backBtn}>Try Receipts</Text>
         <Text style={styles.stepCount}>4 / 4</Text>
@@ -309,7 +321,7 @@ export default function Onboarding() {
       <View style={styles.bottomCta}>
         <PillButton label="Skip — explore later" variant="light" onPress={finish} flex />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -392,13 +404,14 @@ const styles = StyleSheet.create({
   },
   inputBar: {
     borderWidth: 1,
-    borderColor: "#e6e6e6",
-    borderRadius: 50,
+    borderColor: designTokens.colors.hairline,
+    borderRadius: designTokens.radii.md,
     paddingHorizontal: 14,
     paddingVertical: 11,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    backgroundColor: designTokens.colors.canvas,
   },
   inputLabel: {
     fontFamily: "Inter_400Regular",
@@ -407,11 +420,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     opacity: 0.55,
   },
-  inputText: {
+  inputTextEmbed: {
     flex: 1,
-    fontFamily: "Inter_400Regular",
-    fontSize: 13,
-    color: "#000000",
+    minWidth: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    fontSize: 15,
   },
   socialRow: { flexDirection: "row", gap: 8 },
   socialPill: {

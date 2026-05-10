@@ -9,15 +9,24 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PillButton } from "@/components/PillButton";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 
 export default function Premium() {
+  const insets = useSafeAreaInsets();
   const { upgradeToPremium } = useApp();
   const [upgraded, setUpgraded] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const shellPad = {
+    paddingTop: getScreenTopPadding(insets.top),
+    paddingBottom: insets.bottom,
+    paddingLeft: insets.left,
+    paddingRight: insets.right,
+  };
 
   async function handleUpgrade() {
     setLoading(true);
@@ -31,7 +40,13 @@ export default function Premium() {
 
   if (upgraded) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: "#c8e6cd" }]}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: "#c8e6cd" },
+          shellPad,
+        ]}
+      >
         <View style={styles.confirmation}>
           <Text style={styles.welcomeEyebrow}>Welcome to premium</Text>
           <Text style={styles.welcomeTitle}>You're in.</Text>
@@ -58,12 +73,12 @@ export default function Premium() {
             style={{ marginTop: 24 }}
           />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, shellPad]}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()}>
           <Text style={styles.backBtn}>← Back</Text>
@@ -129,7 +144,7 @@ export default function Premium() {
           flex
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

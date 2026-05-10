@@ -7,12 +7,14 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { SuggestItem } from "@/components/SuggestItem";
+import { TextField } from "@/components/TextField";
+import { designTokens } from "@/constants/designTokens";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 
 const TRENDING = [
@@ -44,7 +46,7 @@ export default function AskHome() {
   const { savedAnswers, user } = useApp();
 
   const [query, setQuery] = useState("");
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<React.ElementRef<typeof TextField>>(null);
 
   function isSafetyQuery(q: string) {
     return SAFETY_PATTERNS.some((p) => q.toLowerCase().includes(p));
@@ -67,7 +69,7 @@ export default function AskHome() {
   return (
     <View style={styles.container}>
       <View
-        style={[styles.topBar, { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) }]}
+        style={[styles.topBar, { paddingTop: getScreenTopPadding(insets.top) }]}
       >
         <Text style={styles.logo}>Receipts</Text>
         <View style={styles.topBarRight}>
@@ -103,13 +105,12 @@ export default function AskHome() {
         <View style={styles.inputRow}>
           <View style={styles.inputWrap}>
             <Text style={styles.inputLabel}>Ask</Text>
-            <TextInput
+            <TextField
               ref={inputRef}
-              style={styles.inputText}
+              style={styles.inputTextEmbed}
               value={query}
               onChangeText={setQuery}
               placeholder="Any health question…"
-              placeholderTextColor="rgba(0,0,0,0.35)"
               returnKeyType="search"
               onSubmitEditing={() => submit(query)}
               multiline={false}
@@ -249,10 +250,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     borderWidth: 1,
-    borderColor: "#e6e6e6",
-    borderRadius: 50,
+    borderColor: designTokens.colors.hairline,
+    borderRadius: designTokens.radii.md,
     paddingHorizontal: 14,
     paddingVertical: 10,
+    backgroundColor: designTokens.colors.canvas,
   },
   inputLabel: {
     fontFamily: "Inter_400Regular",
@@ -261,11 +263,14 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     opacity: 0.55,
   },
-  inputText: {
+  inputTextEmbed: {
     flex: 1,
-    fontFamily: "Inter_400Regular",
-    fontSize: 13,
-    color: "#000000",
+    minWidth: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    fontSize: 15,
   },
   sendBtn: {
     width: 52,
@@ -274,6 +279,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "center",
+    ...(Platform.OS === "web"
+      ? ({ cursor: "pointer" } as const)
+      : {}),
   },
   sendBtnText: { color: "#ffffff", fontSize: 20 },
   section: { paddingHorizontal: 18, paddingTop: 16, gap: 6 },

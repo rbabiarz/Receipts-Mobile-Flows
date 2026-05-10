@@ -16,6 +16,8 @@ import { GradeChip } from "@/components/GradeChip";
 import { HeroBlock } from "@/components/HeroBlock";
 import { MonoLabel } from "@/components/MonoLabel";
 import { PillButton } from "@/components/PillButton";
+import { designTokens } from "@/constants/designTokens";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 
 type TabType = "protocol" | "readout";
@@ -26,6 +28,9 @@ const STATUS_BLOCK: Record<string, "mint" | "lilac" | "cream" | "pink"> = {
   paused: "cream",
   done: "pink",
 };
+
+const webPressable =
+  Platform.OS === "web" ? ({ cursor: "pointer" } as const) : {};
 
 export default function ProtocolDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -38,7 +43,7 @@ export default function ProtocolDetail() {
   if (!protocol) {
     return (
       <View style={styles.container}>
-        <View style={[styles.header, { paddingTop: insets.top }]}>
+        <View style={[styles.header, { paddingTop: getScreenTopPadding(insets.top) }]}>
           <Pressable onPress={() => router.back()}>
             <Text style={styles.backBtn}>← Stack</Text>
           </Pressable>
@@ -60,22 +65,32 @@ export default function ProtocolDetail() {
   }
 
   function handleRemove() {
-    Alert.alert(
-      "Remove protocol",
-      `Remove "${protocol!.name}" from your Stack?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Remove",
-          style: "destructive",
-          onPress: async () => {
-            await removeProtocol(protocol!.id);
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            router.back();
-          },
-        },
-      ]
-    );
+    const p = protocol!;
+    const message = `Remove "${p.name}" from your Stack?`;
+
+    const runRemove = async () => {
+      await removeProtocol(p.id);
+      if (Platform.OS !== "web") {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      }
+      router.back();
+    };
+
+    if (Platform.OS === "web") {
+      if (typeof globalThis !== "undefined" && globalThis.confirm(message)) {
+        void runRemove();
+      }
+      return;
+    }
+
+    Alert.alert("Remove protocol", message, [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: () => void runRemove(),
+      },
+    ]);
   }
 
   return (
@@ -83,20 +98,41 @@ export default function ProtocolDetail() {
       <View
         style={[
           styles.header,
-          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+          { paddingTop: getScreenTopPadding(insets.top) },
         ]}
       >
         <Pressable onPress={() => router.back()}>
           <Text style={styles.backBtn}>← Stack</Text>
         </Pressable>
         <View style={styles.headerRight}>
-          <Pressable onPress={handlePause} style={styles.menuBtn}>
+          <Pressable
+            onPress={handlePause}
+            style={({ pressed }) => [
+              styles.menuBtn,
+              webPressable,
+              { opacity: pressed ? 0.75 : 1 },
+            ]}
+          >
             <Text style={styles.menuBtnText}>
               {protocol.status === "paused" ? "Resume" : "Pause"}
             </Text>
           </Pressable>
-          <Pressable onPress={handleRemove} style={styles.menuBtn}>
-            <Text style={[styles.menuBtnText, { color: "#f3c9b6" }]}>Remove</Text>
+          <Pressable
+            onPress={handleRemove}
+            style={({ pressed }) => [
+              styles.menuBtn,
+              webPressable,
+              { opacity: pressed ? 0.75 : 1 },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Remove protocol from stack"
+          >
+            <Text
+              style={[styles.menuBtnText, styles.menuBtnTextDestructive]}
+              selectable={false}
+            >
+              Remove
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -142,7 +178,7 @@ export default function ProtocolDetail() {
         contentContainerStyle={{ paddingBottom: 100 + (Platform.OS === "web" ? 34 : 0) }}
       >
         {tab === "readout" && protocol.readoutAvailable ? (
-          <ReadoutTab protocol={protocol} />
+          <ReadoutTab protocol={protocol} onPausePress={handlePause} />
         ) : (
           <ProtocolTab protocol={protocol} />
         )}
@@ -205,7 +241,13 @@ function ProtocolTab({ protocol }: { protocol: ReturnType<typeof useApp>["myStac
   );
 }
 
-function ReadoutTab({ protocol }: { protocol: ReturnType<typeof useApp>["myStack"][0] }) {
+function ReadoutTab({
+  protocol,
+  onPausePress,
+}: {
+  protocol: ReturnType<typeof useApp>["myStack"][0];
+  onPausePress: () => void;
+}) {
   return (
     <>
       <HeroBlock color="cream" style={{ paddingHorizontal: 18, paddingVertical: 16, gap: 8 }}>
@@ -259,7 +301,12 @@ function ReadoutTab({ protocol }: { protocol: ReturnType<typeof useApp>["myStack
 
       <View style={[styles.section, { flexDirection: "row", gap: 8 }]}>
         <PillButton label="Continue protocol" flex onPress={() => {}} />
-        <PillButton label="Pause" variant="light" flex onPress={() => {}} />
+        <PillButton
+          label={protocol.status === "paused" ? "Resume" : "Pause"}
+          variant="light"
+          flex
+          onPress={onPausePress}
+        />
       </View>
     </>
   );
@@ -286,6 +333,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   menuBtnText: { fontFamily: "Inter_500Medium", fontSize: 11, color: "#000000" },
+  menuBtnTextDestructive: { color: designTokens.colors.destructive },
   protocolTitle: {
     fontFamily: "Inter_600SemiBold",
     fontSize: 20,

@@ -9,13 +9,21 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PillButton } from "@/components/PillButton";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 
 export default function Safety() {
+  const insets = useSafeAreaInsets();
+  const shellPad = {
+    paddingTop: getScreenTopPadding(insets.top),
+    paddingBottom: insets.bottom,
+    paddingLeft: insets.left,
+    paddingRight: insets.right,
+  };
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <View style={[styles.container, shellPad]}>
       <View style={styles.coral}>
         <Text style={styles.eyebrow}>Triage layer · acute-symptom pattern matched</Text>
         <Text style={styles.heading}>
@@ -64,7 +72,7 @@ export default function Safety() {
           Receipts does not provide medical advice. Always consult a qualified healthcare provider for symptoms.
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

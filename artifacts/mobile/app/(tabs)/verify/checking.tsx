@@ -16,6 +16,7 @@ import { LoaderStage } from "@/components/LoaderStage";
 import { MonoLabel } from "@/components/MonoLabel";
 import { PillButton } from "@/components/PillButton";
 import { ReceiptRow } from "@/components/ReceiptRow";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { GradeLevel, Receipt, VerifyResult, VerdictType } from "@/types";
 
@@ -105,7 +106,7 @@ export default function Checking() {
         <View
           style={[
             styles.header,
-            { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+            { paddingTop: getScreenTopPadding(insets.top) },
           ]}
         >
           <Pressable onPress={() => router.back()}>
@@ -142,7 +143,7 @@ export default function Checking() {
       <View
         style={[
           styles.header,
-          { paddingTop: insets.top + (Platform.OS === "web" ? 67 : 0) },
+          { paddingTop: getScreenTopPadding(insets.top) },
         ]}
       >
         <Pressable onPress={() => router.back()}>

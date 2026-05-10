@@ -9,10 +9,11 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { PillButton } from "@/components/PillButton";
 import { MonoLabel } from "@/components/MonoLabel";
+import { PillButton } from "@/components/PillButton";
+import { getScreenTopPadding } from "@/constants/screenInsets";
 
 type VoiceState = "idle" | "listening" | "processing" | "answer";
 
@@ -27,6 +28,13 @@ const SUGGESTIONS = [
 ];
 
 export default function Voice() {
+  const insets = useSafeAreaInsets();
+  const shellPad = {
+    paddingTop: getScreenTopPadding(insets.top),
+    paddingBottom: insets.bottom,
+    paddingLeft: insets.left,
+    paddingRight: insets.right,
+  };
   const [state, setState] = useState<VoiceState>("idle");
   const orbAnim = useRef(new Animated.Value(1)).current;
   const barAnims = useRef(Array.from({ length: 10 }, () => new Animated.Value(0.3))).current;
@@ -73,7 +81,7 @@ export default function Voice() {
 
   if (state === "idle") {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, shellPad]}>
         <View style={styles.header}>
           <Pressable onPress={() => router.back()}>
             <Text style={styles.backBtn}>← Voice</Text>
@@ -104,13 +112,13 @@ export default function Voice() {
             ))}
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (state === "listening") {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, shellPad]}>
         <View style={styles.header}>
           <Text style={styles.listeningTitle}>Listening</Text>
           <Text style={styles.listeningDot}>●</Text>
@@ -143,23 +151,23 @@ export default function Voice() {
           <PillButton label="Cancel" variant="light" onPress={() => setState("idle")} flex />
           <PillButton label="Done" onPress={done} flex />
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   if (state === "processing") {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, shellPad]}>
         <View style={styles.centerContent}>
           <Text style={styles.processingText}>Researching…</Text>
           <Text style={styles.processingHint}>Grounding in your library</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, shellPad]}>
       <View style={styles.header}>
         <Pressable onPress={() => setState("idle")}>
           <Text style={styles.backBtn}>← Answer</Text>
@@ -183,7 +191,7 @@ export default function Voice() {
           onPress={() => router.back()}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

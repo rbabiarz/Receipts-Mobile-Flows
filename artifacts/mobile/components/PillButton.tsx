@@ -1,11 +1,14 @@
 import React from "react";
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
   type ViewStyle,
 } from "react-native";
+
+import { designTokens } from "@/constants/designTokens";
 
 interface Props {
   label: string;
@@ -34,22 +37,27 @@ export function PillButton({
     dark: "#000000",
     light: "#ffffff",
     ghost: "rgba(0,0,0,0.05)",
-    danger: "#f3c9b6",
+    danger: "#ffffff",
   }[variant];
 
   const textColor = {
     dark: "#ffffff",
     light: "#000000",
     ghost: "#000000",
-    danger: "#000000",
+    danger: designTokens.colors.destructive,
   }[variant];
 
   const borderColor = {
     dark: "transparent",
     light: "#e6e6e6",
     ghost: "transparent",
-    danger: "transparent",
+    danger: "rgba(198, 40, 40, 0.45)",
   }[variant];
+
+  const webButtonFix =
+    Platform.OS === "web"
+      ? ({ cursor: "pointer", userSelect: "none" } as const)
+      : {};
 
   return (
     <Pressable
@@ -57,6 +65,7 @@ export function PillButton({
       disabled={disabled || loading}
       style={({ pressed }) => [
         styles.pill,
+        webButtonFix,
         {
           backgroundColor: bgColor,
           borderColor,
@@ -72,6 +81,7 @@ export function PillButton({
         <ActivityIndicator size="small" color={textColor} />
       ) : (
         <Text
+          selectable={false}
           style={[
             styles.label,
             { color: textColor, fontSize: isSmall ? 13 : 16 },
