@@ -59,7 +59,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
         qualityFlags: ["High-impact journal", "Multi-species"],
         whyMatters: "The paper that made taurine famous. Mechanistic signal strong.",
         fundingFlag: "NIH funded",
-        url: "https://pubmed.ncbi.nlm.nih.gov/37236008/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=singh+taurine+deficiency+aging+science+2023",
       },
       {
         id: "r2",
@@ -71,7 +71,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
         plainEnglish: "Meta of 12 RCTs: SBP −3 mmHg, triglycerides down. Heterogeneity high.",
         qualityFlags: ["Preregistered", "12 RCTs"],
         whyMatters: "Best human evidence. Modest but consistent.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/38261657/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=taurine+cardiometabolic+meta-analysis+RCT+blood+pressure",
       },
       {
         id: "r3",
@@ -81,7 +81,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
         studyType: "RCT",
         tags: ["B · RCT"],
         plainEnglish: "12 weeks of 1.6 g/day taurine improved endothelial function vs placebo.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/26511157/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=sun+taurine+endothelial+prehypertensive+2016",
       },
     ] as Receipt[],
     contradictions: 2,
@@ -178,7 +178,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "10-week RCT of 250 mg/day NMN in overweight postmenopausal women. NAD+ rose in blood. No improvement in insulin sensitivity, body composition, or lipids.",
         qualityFlags: ["Randomized", "Double-blind", "Science journal"],
         whyMatters: "Most cited human NMN RCT. Confirms NAD+ pharmacokinetics but raises doubts about functional benefit.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/34385721/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=yoshino+nicotinamide+mononucleotide+insulin+sensitivity+women+science+2021",
       },
       {
         id: "n2",
@@ -191,7 +191,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "250 mg/day NMN for 12 weeks in older adults. NAD+ rose in blood. Gait speed modestly improved in subgroup. Primary endpoints not significant.",
         qualityFlags: ["Double-blind", "Small N"],
         whyMatters: "Suggests physical performance signal but underpowered. Not sufficient to confirm clinical benefit.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/35232985/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=igarashi+nicotinamide+mononucleotide+older+adults+safety+efficacy",
       },
       {
         id: "n3",
@@ -204,7 +204,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "NR converts to NMN in plasma before entering cells. Both precursors raise NAD+ via the same pathway. Form may matter less than dose.",
         qualityFlags: ["High-impact journal"],
         whyMatters: "NR vs NMN debate: the distinction may be less important than the marketing suggests.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/27722507/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=trammell+nicotinamide+riboside+pharmacokinetics+nature+communications+2016",
       },
     ] as Receipt[],
     contradictions: 1,
@@ -238,7 +238,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "13-week RCT: berberine 500 mg ×3 matched metformin for HbA1c reduction (−2.0% vs −1.8%) and fasting glucose. GI side effects similar.",
         qualityFlags: ["Randomized", "Active comparator"],
         whyMatters: "The foundational head-to-head trial. Real comparison against clinical standard-of-care.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/18397984/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=zhang+berberine+metformin+type+2+diabetes+2008",
       },
       {
         id: "b2",
@@ -251,7 +251,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "27 RCTs (n=2,569): berberine significantly reduced HbA1c, fasting glucose, and post-meal glucose vs placebo. High heterogeneity in doses and populations.",
         qualityFlags: ["Large meta", "Preregistered"],
         whyMatters: "Confirms glycemic effect across diverse trials. Heterogeneity limits precision of effect size.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/31131922/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=berberine+glycemic+control+systematic+review+meta-analysis",
       },
       {
         id: "b3",
@@ -264,7 +264,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "Berberine inhibits CYP3A4, CYP2D6, and P-glycoprotein. Clinically relevant interactions with cyclosporine, statins, and anticoagulants.",
         qualityFlags: ["Mechanistic review"],
         whyMatters: "Often overlooked. Berberine is not a benign supplement for people on multiple medications.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/31888388/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=berberine+CYP450+drug+interactions+pharmacokinetics+review",
       },
     ] as Receipt[],
     contradictions: 0,
@@ -298,7 +298,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "500 mg/day magnesium vs placebo in elderly adults with insomnia. Significant improvement in ISI score, sleep time, and early morning awakening.",
         qualityFlags: ["Double-blind", "Validated sleep scale"],
         whyMatters: "Best direct evidence for magnesium on sleep endpoints.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/23853635/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=abbasi+magnesium+supplementation+insomnia+elderly",
       },
       {
         id: "m2",
@@ -311,7 +311,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "10 RCTs: magnesium reduced migraine frequency by ~41% vs placebo. Effect consistent across forms (citrate, oxide). Grade A evidence for prophylaxis.",
         qualityFlags: ["Cochrane", "Consistent effect"],
         whyMatters: "Migraine prevention is the strongest evidence-base for magnesium in any neurological indication.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/33428454/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=magnesium+migraine+prophylaxis+meta-analysis+RCT",
       },
       {
         id: "m3",
@@ -324,7 +324,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "Threonate form uniquely raises brain magnesium in rats, improving synaptic density and memory. Human BBB data is indirect.",
         qualityFlags: ["High-impact journal", "Mechanistic"],
         whyMatters: "Foundational paper for threonate claims. Human translation is plausible but not yet RCT-confirmed.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/20152124/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=liu+magnesium+threonate+synaptic+density+memory+neuron+2010",
       },
     ] as Receipt[],
     contradictions: 0,
@@ -358,7 +358,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "48 trained athletes randomized to 4 training distributions for 9 weeks. Polarized group showed greatest VO₂max gain (+11.7%) vs threshold (+7.3%) and HIIT (+4.8%).",
         qualityFlags: ["Randomized", "Active comparator", "Trained athletes"],
         whyMatters: "The most cited RCT directly comparing training distributions. Polarized wins clearly.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/24550842/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=stoggl+seiler+polarized+training+endurance+performance",
       },
       {
         id: "z2",
@@ -371,7 +371,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "Zone 2 training drives PGC-1α, mitochondrial biogenesis, and fat oxidation adaptations not replicated by HIIT. Mechanism of cardiometabolic benefit.",
         qualityFlags: ["Clear mechanism", "Well-cited"],
         whyMatters: "Explains why Zone 2 and HIIT are not substitutes despite both raising VO₂max.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/29495774/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=san-millan+brooks+zone+2+training+mitochondria+lactate",
       },
       {
         id: "z3",
@@ -384,7 +384,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "37 studies: HIIT produced larger VO₂max improvements than moderate-intensity continuous training. Effect size greater in sedentary adults.",
         qualityFlags: ["Large meta"],
         whyMatters: "Supports HIIT for VO₂max efficiency — but doesn't capture metabolic or mitochondrial endpoints where Zone 2 excels.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/23980143/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=bacon+high+intensity+interval+training+vo2max+meta-analysis",
       },
     ] as Receipt[],
     contradictions: 1,
@@ -418,7 +418,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "5 g/day creatine for 6 weeks in young adults improved working memory and processing speed vs placebo. Effect larger in vegetarians.",
         qualityFlags: ["Randomized", "Double-blind"],
         whyMatters: "Foundational human RCT for creatine cognition claim.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/14561278/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=rae+creatine+working+memory+vegetarians+psychopharmacology+2003",
       },
       {
         id: "c2",
@@ -431,7 +431,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "Creatine attenuated cognitive decline during 24-hour sleep deprivation. Working memory and reaction time preserved vs placebo.",
         qualityFlags: ["Randomized", "Crossover design"],
         whyMatters: "Best evidence for creatine's practical cognitive use case: protecting function during sleep loss.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/17567241/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=mcmorris+creatine+sleep+deprivation+cognitive+performance",
       },
       {
         id: "c3",
@@ -444,7 +444,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "22 RCTs: creatine + resistance training increased lean mass and strength vs training alone. Effect consistent across age groups.",
         qualityFlags: ["Large meta", "Consistent effect"],
         whyMatters: "Strongest physical performance evidence. Cognitive and physical benefits are separate mechanisms.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/14636102/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=rawson+creatine+resistance+training+meta-analysis+strength",
       },
     ] as Receipt[],
     contradictions: 0,
@@ -478,7 +478,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "Systematic review of cold water's catecholamine response: NE rises 200–300%, dopamine ~250%, cortisol transiently. Mood benefit mechanism supported.",
         qualityFlags: ["Well-cited"],
         whyMatters: "Best mechanistic support for the mood/alertness claim from cold exposure.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/17993252/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=shevchuk+cold+water+immersion+norepinephrine+dopamine",
       },
       {
         id: "cl2",
@@ -491,7 +491,7 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "Post-workout cold immersion (10°C, 10 min) reduced satellite cell activity and Type II fiber hypertrophy vs active recovery over 12 weeks of strength training.",
         qualityFlags: ["Randomized", "Biopsy endpoints"],
         whyMatters: "Critical finding: post-workout cold reduces muscle gains. Timing matters enormously.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/26174222/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=roberts+cold+water+immersion+muscle+hypertrophy+strength+2015",
       },
       {
         id: "cl3",
@@ -504,12 +504,194 @@ const MOCK_ANSWERS: Record<string, Partial<Answer>> = {
           "36 trials: cold water immersion reduced DOMS and perceived fatigue in the 24–96h window vs passive recovery. Effect size moderate.",
         qualityFlags: ["Large meta"],
         whyMatters: "Recovery benefit is real — but similar to contrast therapy and inferior for strength athletes.",
-        url: "https://pubmed.ncbi.nlm.nih.gov/26466906/",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=hohenauer+cold+water+immersion+recovery+DOMS+meta-analysis",
       },
     ] as Receipt[],
     contradictions: 1,
     sourceCount: 14,
     duration: "11s",
+  },
+
+  trf: {
+    grade: "B" as GradeLevel,
+    gradeLabel: "Moderate",
+    headline:
+      "Time-restricted eating improves metabolic markers in overweight adults — benefits in lean, healthy people are modest and not consistently replicated.",
+    summary:
+      "The most robust evidence comes from trials in overweight/obese adults with metabolic risk. A 2020 NEJM trial (Lowe et al.) found 16:8 TRE produced similar weight loss to caloric restriction alone with no additional metabolic benefit. TREAT (Lowe 2020, JAMA Int Med) found no significant advantage of TRE vs unrestricted eating in overweight adults over 12 weeks. Sutton et al. 2018 showed early TRE (eating window aligned with morning) improved insulin sensitivity and blood pressure in pre-diabetic men without weight loss. The circadian alignment of the eating window appears to matter more than duration alone.",
+    takeaways: [
+      "Early TRE (7am–3pm window) shows stronger metabolic benefit than late windows.",
+      "Weight loss from TRE is mostly explained by caloric restriction, not the time window.",
+      "No consistent benefit demonstrated in metabolically healthy, lean adults.",
+      "16:8 is the best-studied protocol; 18:6 adds no proven incremental benefit.",
+      "Circadian mismatch (late eating window) may reduce or negate metabolic gains.",
+    ],
+    receipts: [
+      {
+        id: "t1",
+        title: "Early Time-Restricted Feeding Improves Insulin Sensitivity",
+        cite: "Sutton · Cell Metabolism · 2018 · RCT · n=8",
+        grade: "B" as GradeLevel,
+        studyType: "RCT",
+        tags: ["B · RCT", "Small N"],
+        plainEnglish:
+          "Pre-diabetic men on a 6-hour early eating window (7am–3pm) for 5 weeks improved insulin sensitivity, blood pressure, and oxidative stress — without weight loss.",
+        qualityFlags: ["Controlled feeding", "Crossover design"],
+        whyMatters: "Best evidence that TRE benefits are metabolic, not just caloric. Circadian alignment is key.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=sutton+early+time-restricted+feeding+insulin+sensitivity+cell+metabolism+2018",
+      },
+      {
+        id: "t2",
+        title: "TREAT Trial: Time-Restricted Eating vs Unrestricted Eating",
+        cite: "Lowe · JAMA Intern Med · 2020 · RCT · n=116",
+        grade: "A" as GradeLevel,
+        studyType: "RCT",
+        tags: ["A · RCT", "Null result"],
+        plainEnglish:
+          "12-week RCT: 16:8 TRE produced no significant weight loss or metabolic advantage vs unrestricted eating in overweight adults. Lean mass was modestly reduced.",
+        qualityFlags: ["Pre-registered", "Large N", "NIH funded"],
+        whyMatters: "The definitive null result. TRE without explicit caloric restriction doesn't work for most people.",
+        fundingFlag: "NIH funded",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=lowe+time-restricted+eating+TREAT+trial+JAMA+internal+medicine+2020",
+      },
+      {
+        id: "t3",
+        title: "Effects of Intermittent Fasting on Metabolic Health — Meta",
+        cite: "Harris · PLOS Medicine · 2018 · Meta · 41 RCTs",
+        grade: "B" as GradeLevel,
+        studyType: "Meta-analysis",
+        tags: ["B · Meta", "Heterogeneity"],
+        plainEnglish:
+          "41 RCTs: intermittent fasting reduces body weight (−0.8–13%), fasting glucose, and insulin vs control. Effect sizes similar to continuous caloric restriction.",
+        qualityFlags: ["Large meta", "Pre-registered"],
+        whyMatters: "IF works, but not better than eating less overall. No magic beyond caloric deficit.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=harris+intermittent+fasting+continuous+energy+restriction+meta-analysis+2018",
+      },
+    ] as Receipt[],
+    contradictions: 1,
+    sourceCount: 41,
+    duration: "11s",
+  },
+
+  rapamycin: {
+    grade: "C" as GradeLevel,
+    gradeLabel: "Suggestive",
+    headline:
+      "Rapamycin extends lifespan in every animal model tested — but zero completed longevity RCTs exist in healthy humans, and immune effects at low doses remain poorly characterized.",
+    summary:
+      "Rapamycin is an mTOR inhibitor approved for transplant immunosuppression. The ITP (Harrison 2009, Nature) showed 9–14% lifespan extension in mice starting at 600 days of age. Multiple independent replications confirm the animal signal. In humans, the PEARL trial (Mannick 2024, Aging Cell) showed intermittent dosing (5 mg/week) was well-tolerated in healthy older adults with some immune enhancement, but the trial wasn't powered for longevity outcomes. Off-label use among longevity researchers is growing. Known risks at transplant doses are real; risks at low intermittent doses are not well established in healthy people.",
+    takeaways: [
+      "Animal lifespan data is among the most replicated in longevity biology — 4+ independent ITP trials.",
+      "No completed longevity RCT in healthy humans exists; PEARL and RAP-ZONE are ongoing.",
+      "Weekly low-dose (2–6 mg) is the most common off-label regimen — not evidence-derived.",
+      "Immune effects are dose-dependent and bidirectional — low doses may enhance, high doses suppress.",
+      "Off-label use carries real regulatory and safety risk; not equivalent to a studied protocol.",
+    ],
+    receipts: [
+      {
+        id: "rap1",
+        title: "Rapamycin Fed Late in Life Extends Lifespan in Mice",
+        cite: "Harrison · Nature · 2009 · Animal · ITP",
+        grade: "D" as GradeLevel,
+        studyType: "Animal",
+        tags: ["D · Animal", "Replicated 4×"],
+        plainEnglish:
+          "Rapamycin started at 600 days (equivalent to ~60 human years) extended median lifespan 9% in females and 14% in males across three genetically diverse mouse strains.",
+        qualityFlags: ["Multi-center ITP", "Replicated", "Diverse strains"],
+        whyMatters: "The landmark paper. Starting late and still getting benefit suggests therapeutic window in older adults.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/19587680/",
+      },
+      {
+        id: "rap2",
+        title: "PEARL Trial: Rapamycin Safety in Healthy Older Adults",
+        cite: "Mannick · Aging Cell · 2024 · RCT · n=120",
+        grade: "B" as GradeLevel,
+        studyType: "RCT",
+        tags: ["B · RCT"],
+        plainEnglish:
+          "120 healthy adults 50–85 randomized to weekly rapamycin (5 mg) vs placebo for 52 weeks. Well-tolerated. Some immune enhancement. Not powered for longevity endpoints.",
+        qualityFlags: ["Randomized", "Double-blind", "Pre-registered"],
+        whyMatters: "First human safety RCT in healthy adults at a longevity-relevant dose. Safety signal encouraging; efficacy unknown.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=mannick+rapamycin+PEARL+trial+healthy+older+adults+aging+cell",
+      },
+      {
+        id: "rap3",
+        title: "mTOR Inhibition and Immune Senescence",
+        cite: "Mannick · Sci Transl Med · 2014 · RCT · n=218",
+        grade: "B" as GradeLevel,
+        studyType: "RCT",
+        tags: ["B · RCT"],
+        plainEnglish:
+          "Older adults on low-dose rapalog (RAD001) for 6 weeks showed enhanced flu vaccine response vs placebo — suggesting immune enhancement rather than suppression at low doses.",
+        qualityFlags: ["Randomized", "Novartis sponsored"],
+        whyMatters: "Challenged assumption that rapamycin always suppresses immunity. Dose and schedule are critical.",
+        fundingFlag: "Funded by Novartis",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=mannick+rapalog+mTOR+immune+senescence+flu+vaccine+science+translational+medicine+2014",
+      },
+    ] as Receipt[],
+    contradictions: 2,
+    sourceCount: 24,
+    duration: "13s",
+  },
+
+  mushrooms: {
+    grade: "C" as GradeLevel,
+    gradeLabel: "Suggestive",
+    headline:
+      "Lion's mane shows early promise for cognitive function and nerve growth — but trials are small, short, and largely in cognitively impaired populations, not healthy adults.",
+    summary:
+      "Hericium erinaceus (lion's mane) contains hericenones and erinacines that stimulate nerve growth factor (NGF) synthesis in vitro and in animal models. The most cited human trial (Mori 2009, Phytother Res) showed significant improvement in cognitive scores in mild cognitive impairment patients over 16 weeks at 3 g/day, but n=30 and the improvement reversed after stopping. A 2023 RCT (Docherty, J Psychopharmacol) in healthy young adults showed improved processing speed but no other cognitive benefits. Reishi and turkey tail have stronger evidence for immune modulation, primarily in cancer-adjacent contexts.",
+    takeaways: [
+      "Best evidence is in MCI patients — benefits in healthy, cognitively normal adults are not established.",
+      "NGF stimulation mechanism is plausible but has not been measured directly in human brain tissue.",
+      "3 g/day whole mushroom extract is the dose used in positive trials — many supplements use lower doses.",
+      "Cognitive benefits reversed after stopping in the Mori 2009 trial — not a permanent change.",
+      "Reishi and turkey tail have more consistent immune data; cognitive claims are lion's mane specific.",
+    ],
+    receipts: [
+      {
+        id: "mu1",
+        title: "Lion's Mane Mushroom and Mild Cognitive Impairment",
+        cite: "Mori · Phytother Res · 2009 · RCT · n=30",
+        grade: "B" as GradeLevel,
+        studyType: "RCT",
+        tags: ["B · RCT", "Small N"],
+        plainEnglish:
+          "30 adults with MCI randomized to 3 g/day lion's mane or placebo for 16 weeks. Cognitive scores improved significantly. Benefits reversed 4 weeks after stopping.",
+        qualityFlags: ["Randomized", "Double-blind"],
+        whyMatters: "Most cited human RCT. Effect is real but small N and MCI population limits generalizability to healthy adults.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=mori+hericium+erinaceus+mild+cognitive+impairment+2009",
+      },
+      {
+        id: "mu2",
+        title: "Lion's Mane in Healthy Young Adults — Cognitive Performance",
+        cite: "Docherty · J Psychopharmacol · 2023 · RCT · n=41",
+        grade: "B" as GradeLevel,
+        studyType: "RCT",
+        tags: ["B · RCT"],
+        plainEnglish:
+          "41 healthy adults 18–45: lion's mane improved speed of lower cognitive processing vs placebo over 28 days. No effect on memory, attention, or mood.",
+        qualityFlags: ["Randomized", "Double-blind", "Healthy population"],
+        whyMatters: "Most rigorous trial in healthy adults. Modest, selective cognitive effect — not the broad nootropic it's marketed as.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=docherty+lion+mane+cognitive+healthy+adults+journal+psychopharmacology+2023",
+      },
+      {
+        id: "mu3",
+        title: "Erinacines and Hericenones — NGF Synthesis Review",
+        cite: "Thongbai · Fitoterapia · 2015 · Review",
+        grade: "D" as GradeLevel,
+        studyType: "Review",
+        tags: ["D · Mechanistic"],
+        plainEnglish:
+          "Review of preclinical evidence: erinacines in lion's mane mycelium stimulate NGF synthesis in vitro and in rodent brains. Fruiting body contains hericenones with similar activity.",
+        qualityFlags: ["Mechanistic clarity"],
+        whyMatters: "Explains the biological rationale. Animal NGF stimulation is promising; human brain translation is unconfirmed.",
+        url: "https://pubmed.ncbi.nlm.nih.gov/?term=hericium+erinaceus+NGF+hericenones+erinacines+fitoterapia",
+      },
+    ] as Receipt[],
+    contradictions: 0,
+    sourceCount: 16,
+    duration: "10s",
   },
 };
 
@@ -536,9 +718,19 @@ function pickAnswerData(query: string): Partial<Answer> {
   if (q.includes("cold") || q.includes("ice bath") || q.includes("cold plunge")) {
     return MOCK_ANSWERS.cold;
   }
+  if (q.includes("time-restricted") || q.includes("intermittent fasting") || q.includes("fasting") || q.includes("eating window") || q.includes("16:8") || q.includes("18:6")) {
+    return MOCK_ANSWERS.trf;
+  }
+  if (q.includes("rapamycin") || q.includes("rapa") || q.includes("mtor")) {
+    return MOCK_ANSWERS.rapamycin;
+  }
+  if (q.includes("mushroom") || q.includes("lion's mane") || q.includes("lions mane") || q.includes("reishi") || q.includes("turkey tail") || q.includes("hericium")) {
+    return MOCK_ANSWERS.mushrooms;
+  }
   if (q.includes("taurine")) {
     return MOCK_ANSWERS.taurine;
   }
+  // Generic fallback — Claude should handle anything not in this list
   return MOCK_ANSWERS.taurine;
 }
 
@@ -554,14 +746,15 @@ export default function AnswerScreen() {
   const [expandedReceipt, setExpandedReceipt] = useState<string | null>(null);
   const [saveBusy, setSaveBusy] = useState(false);
   const [apiResult, setApiResult] = useState<Partial<Answer> | null>(null);
-  const [apiDone, setApiDone] = useState(false);
 
+  const apiDoneRef = useRef(false);
   const animDoneRef = useRef(false);
   const transitionedRef = useRef(false);
 
   const answerData: Partial<Answer> = apiResult ?? pickAnswerData(q ?? "");
 
-  function doTransition() {
+  // Stable ref so effects can call it without stale-closure issues
+  const doTransitionRef = useRef(() => {
     if (transitionedRef.current) return;
     transitionedRef.current = true;
     setCurrentStep(REASONING_STAGES.length);
@@ -569,15 +762,16 @@ export default function AnswerScreen() {
       setStage("answer");
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }, 400);
-  }
+  });
 
-  // Fire the Claude API call immediately — updates apiDone when complete
+  // Fire the Claude API call immediately; whichever finishes last triggers the transition
   useEffect(() => {
     let cancelled = false;
     askClaude(q ?? "").then((result) => {
       if (cancelled) return;
       if (result) setApiResult(result);
-      setApiDone(true);
+      apiDoneRef.current = true;
+      if (animDoneRef.current) doTransitionRef.current();
     });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -592,18 +786,11 @@ export default function AnswerScreen() {
       if (step >= REASONING_STAGES.length - 1) {
         clearInterval(interval);
         animDoneRef.current = true;
+        if (apiDoneRef.current) doTransitionRef.current();
       }
     }, 500);
     return () => clearInterval(interval);
   }, []);
-
-  // Transition once both animation and API are done
-  useEffect(() => {
-    if (apiDone && animDoneRef.current) {
-      doTransition();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiDone]);
 
   function handleAddToStack() {
     router.push({

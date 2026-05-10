@@ -108,6 +108,39 @@ function deriveProtocol(query: string): ProtocolDefaults {
       evidence: "C",
     };
   }
+  if (q.includes("time-restricted") || q.includes("intermittent fasting") || q.includes("fasting") || q.includes("eating window") || q.includes("16:8")) {
+    return {
+      name: "Time-Restricted Eating 16:8",
+      dose: "8-hour eating window",
+      timing: "7am–3pm or 10am–6pm (earlier is better)",
+      duration: "12 weeks",
+      outcome: "Fasting glucose + insulin + body weight",
+      hypothesis: "Improve metabolic markers via circadian-aligned eating restriction",
+      evidence: "B",
+    };
+  }
+  if (q.includes("rapamycin") || q.includes("rapa") || q.includes("mtor")) {
+    return {
+      name: "Rapamycin (off-label) 5 mg/wk",
+      dose: "5 mg",
+      timing: "Once weekly",
+      duration: "12 weeks",
+      outcome: "Immune markers + subjective energy",
+      hypothesis: "Evaluate mTOR inhibition safety and immune effects at low intermittent dose",
+      evidence: "C",
+    };
+  }
+  if (q.includes("mushroom") || q.includes("lion's mane") || q.includes("lions mane") || q.includes("reishi")) {
+    return {
+      name: "Lion's Mane 3 g/day",
+      dose: "3 g whole mushroom extract",
+      timing: "AM with food",
+      duration: "12 weeks",
+      outcome: "Cognitive function (subjective) + processing speed",
+      hypothesis: "Evaluate NGF-mediated cognitive benefit from lion's mane supplementation",
+      evidence: "C",
+    };
+  }
   if (q.includes("taurine")) {
     return {
       name: "Taurine 2 g/day",
