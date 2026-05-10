@@ -35,6 +35,7 @@ jobs:
         working-directory: artifacts/mobile
         env:
           EXPO_PUBLIC_ANTHROPIC_API_KEY: ${{ secrets.EXPO_PUBLIC_ANTHROPIC_API_KEY }}
+          EXPO_DEPLOY_BASE_URL: /Receipts-Mobile-Flows
         run: npx expo export --platform web
 
       - name: Upload artifact
