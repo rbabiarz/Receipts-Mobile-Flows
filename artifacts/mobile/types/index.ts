@@ -9,6 +9,7 @@ export interface Receipt {
   id: string;
   title: string;
   cite: string;
+  url?: string;
   grade: GradeLevel;
   studyType: string;
   tags: string[];

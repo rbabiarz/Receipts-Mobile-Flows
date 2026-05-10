@@ -18,19 +18,133 @@ import { getScreenTopPadding } from "@/constants/screenInsets";
 import { useApp } from "@/context/AppContext";
 import type { Protocol } from "@/types";
 
+interface ProtocolDefaults {
+  name: string;
+  dose: string;
+  timing: string;
+  duration: string;
+  outcome: string;
+  hypothesis: string;
+  evidence: "A" | "B" | "C" | "D";
+}
+
+function deriveProtocol(query: string): ProtocolDefaults {
+  const q = query.toLowerCase();
+
+  if (q.includes("omega") || q.includes("fish oil") || q.includes("epa") || q.includes("dha")) {
+    return {
+      name: "Omega-3 EPA 2 g/day",
+      dose: "2 g EPA",
+      timing: "With largest meal",
+      duration: "12 weeks",
+      outcome: "Triglycerides + LDL-C",
+      hypothesis: "Reduce triglycerides via high-dose EPA supplementation",
+      evidence: "B",
+    };
+  }
+  if (q.includes("nmn") || q.includes("nad") || q.includes("nicotinamide")) {
+    return {
+      name: "NMN 500 mg/day",
+      dose: "500 mg",
+      timing: "AM, fasted",
+      duration: "12 weeks",
+      outcome: "NAD+ levels + biological age markers",
+      hypothesis: "Raise NAD+ and evaluate downstream metabolic markers",
+      evidence: "C",
+    };
+  }
+  if (q.includes("berberine") || q.includes("metformin")) {
+    return {
+      name: "Berberine 500 mg ×3",
+      dose: "500 mg",
+      timing: "×3 with meals",
+      duration: "12 weeks",
+      outcome: "Fasting glucose + HbA1c",
+      hypothesis: "Improve glycemic control via AMPK activation",
+      evidence: "B",
+    };
+  }
+  if (q.includes("magnesium") || q.includes("glycinate") || q.includes("threonate")) {
+    return {
+      name: "Magnesium Glycinate 400 mg",
+      dose: "400 mg",
+      timing: "PM, 1h before sleep",
+      duration: "8 weeks",
+      outcome: "Sleep onset latency + HRV",
+      hypothesis: "Improve sleep quality by restoring magnesium status",
+      evidence: "A",
+    };
+  }
+  if (q.includes("zone 2") || q.includes("zone2") || q.includes("hiit") || q.includes("vo2") || q.includes("vo₂")) {
+    return {
+      name: "Zone 2, 150 min/wk",
+      dose: "150 min/week",
+      timing: "3–4 sessions, split evenly",
+      duration: "12 weeks",
+      outcome: "VO₂max + fasting glucose",
+      hypothesis: "Build aerobic base and improve metabolic markers",
+      evidence: "A",
+    };
+  }
+  if (q.includes("creatine")) {
+    return {
+      name: "Creatine Monohydrate 5 g/day",
+      dose: "5 g",
+      timing: "Post-workout or AM",
+      duration: "Ongoing",
+      outcome: "Working memory + grip strength",
+      hypothesis: "Improve cognition and strength via creatine saturation",
+      evidence: "A",
+    };
+  }
+  if (q.includes("cold") || q.includes("ice bath") || q.includes("cold plunge")) {
+    return {
+      name: "Cold Plunge 3×/wk",
+      dose: "3× per week, 2–3 min at 10–15°C",
+      timing: "Not within 4h of strength training",
+      duration: "8 weeks",
+      outcome: "Recovery score + mood (subjective)",
+      hypothesis: "Improve recovery and mood via norepinephrine response",
+      evidence: "C",
+    };
+  }
+  if (q.includes("taurine")) {
+    return {
+      name: "Taurine 2 g/day",
+      dose: "2 g",
+      timing: "AM, w/ food",
+      duration: "12 weeks",
+      outcome: "SBP + ApoB",
+      hypothesis: "Reduce BP and improve lipid profile based on RCT evidence",
+      evidence: "B",
+    };
+  }
+  // Generic fallback — use the query text as the protocol name
+  const capitalized = query.trim().slice(0, 1).toUpperCase() + query.trim().slice(1);
+  return {
+    name: capitalized.slice(0, 50),
+    dose: "Per evidence-supported dose",
+    timing: "Per study protocol",
+    duration: "8–12 weeks",
+    outcome: "Track relevant biomarkers before + after",
+    hypothesis: `Evaluate ${query.trim()} based on current evidence`,
+    evidence: "C",
+  };
+}
+
 export default function AddToStack() {
   const { from } = useLocalSearchParams<{ from: string }>();
   const insets = useSafeAreaInsets();
   const { addProtocol } = useApp();
 
-  const [name, setName] = useState("Taurine 2 g/day");
-  const [dose, setDose] = useState("2 g");
-  const [timing, setTiming] = useState("AM, w/ food");
-  const [duration, setDuration] = useState("12 weeks");
-  const [outcome, setOutcome] = useState("SBP + ApoB");
-  const [hypothesis, setHypothesis] = useState(
-    "Reduce BP and improve lipid profile based on RCT evidence"
-  );
+  const defaults = deriveProtocol(from ?? "");
+
+  const [name, setName] = useState(defaults.name);
+  const [dose, setDose] = useState(defaults.dose);
+  const [timing, setTiming] = useState(defaults.timing);
+  const [duration, setDuration] = useState(defaults.duration);
+  const [outcome, setOutcome] = useState(defaults.outcome);
+  const [hypothesis, setHypothesis] = useState(defaults.hypothesis);
   const [loading, setLoading] = useState(false);
 
   async function handleAdd() {
@@ -41,7 +155,7 @@ export default function AddToStack() {
       name,
       status: "trial",
       startDate: new Date().toISOString().split("T")[0],
-      evidence: "B",
+      evidence: defaults.evidence,
       dose,
       timing,
       duration,

@@ -114,6 +114,9 @@ export default function AskHome() {
               returnKeyType="search"
               onSubmitEditing={() => submit(query)}
               multiline={false}
+              autoCorrect={false}
+              autoCapitalize="none"
+              autoComplete="off"
             />
           </View>
           <Pressable
@@ -271,6 +274,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
     fontSize: 15,
+    lineHeight: undefined,
+    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : {}),
   },
   sendBtn: {
     width: 52,
